@@ -21,7 +21,7 @@ git clone -b claude/natu-newsletter-agent-ttzg1l https://github.com/digitalmanag
 /opt/natu-agentes/deploy/crear-env.sh
 ```
 
-El script pide (sin mostrarlas) la clave de OpenAI, la de Mailrelay y la cadena de conexión de Neon (consola de Neon → proyecto **natu-agentes** → Connect → base `natu_agentes`), y la URL del webhook de eventos de n8n. Genera el resto de claves y muestra las dos que hay que poner en n8n.
+El script pide (sin mostrarlas) la clave de OpenAI, la de Mailrelay y la cadena de conexión de Neon (consola de Neon → proyecto **natu-agentes** → Connect → base `natu_agentes`). El webhook de eventos ya apunta a `https://natulab.app.n8n.cloud/webhook/natu-newsletter-eventos`. Genera el resto de claves y muestra las dos que hay que poner en n8n.
 
 ## 4. Arrancar
 
@@ -59,3 +59,7 @@ cd /opt/natu-agentes && git pull && docker compose up -d --build
 ```bash
 docker logs --tail 100 natu-agent-newsletter
 ```
+
+## Prueba de programación realizada (24/11/2026)
+
+En Mailrelay existe el grupo **"Prueba agente"** (id 12) con una sola dirección (digitalmanager@natuaromatic.com). Se creó el borrador 85 solo para ese grupo, se programó a 3 días (`pending` a la hora UTC esperada) y se canceló (`cancelled`). El grupo puede reutilizarse para pruebas.

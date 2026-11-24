@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Crea /opt/natu-agentes/.env pidiendo las claves por teclado (no se muestran ni quedan en el historial).
+# El webhook de eventos apunta al n8n de NATU (natulab.app.n8n.cloud).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 if [ -f .env ]; then echo ".env ya existe. Bórralo antes si quieres regenerarlo."; exit 1; fi
@@ -7,7 +8,7 @@ leer() { local v; read -r -s -p "$1: " v; echo >&2; printf '%s' "$v"; }
 OPENAI=$(leer "Clave de OpenAI (sk-...)")
 MAILRELAY=$(leer "Clave de API de Mailrelay")
 DBURL=$(leer "Cadena de conexión de Neon (postgresql://...)")
-read -r -p "URL del webhook de eventos de n8n (https://.../webhook/natu-newsletter-eventos): " N8NURL
+N8NURL=https://natulab.app.n8n.cloud/webhook/natu-newsletter-eventos
 umask 077
 cat > .env <<ENV
 PORT=3002
