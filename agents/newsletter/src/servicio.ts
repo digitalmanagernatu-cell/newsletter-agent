@@ -235,6 +235,17 @@ export async function estado(opts: { peticion_id?: string; tarea_id?: string }) 
   return { peticion: pet, tarea: ultimaTarea && { id: ultimaTarea.id, tipo: ultimaTarea.tipo, estado: ultimaTarea.estado, error: ultimaTarea.error }, versiones, historial };
 }
 
+/** Últimas peticiones (opcionalmente de una persona), para que un asistente pueda decir "cómo va lo mío". */
+export async function listar(opts: { solicitante?: string; limite?: number }) {
+  const limite = Math.min(Math.max(opts.limite ?? 5, 1), 20);
+  return q(
+    `SELECT p.id AS peticion_id, p.marca, p.estado, p.peticion->>'objetivo' AS objetivo, p.peticion->'idiomas' AS idiomas,
+            p.envio_previsto, p.solicitante, p.creado, p.actualizado,
+            (SELECT max(numero) FROM newsletter.versiones v WHERE v.peticion_id = p.id) AS ronda
+     FROM newsletter.peticiones p WHERE ($1::text IS NULL OR lower(p.solicitante) = lower($1)) AND p.estado <> 'cancelada'
+     ORDER BY p.creado DESC LIMIT $2`, [opts.solicitante ?? null, limite]);
+}
+
 /** Al arrancar, las tareas que quedaron a medias por un reinicio se marcan como error. */
 export async function limpiarTareasHuérfanas() {
   await q(`UPDATE shared.tareas SET estado = 'error', error = 'Interrumpida por reinicio del servicio', actualizado = now()

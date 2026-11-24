@@ -7,7 +7,10 @@ export function db(): pg.Pool {
   if (!pool) {
     const url = process.env.DATABASE_URL;
     if (!url) throw new Error('Falta DATABASE_URL');
-    pool = new pg.Pool({ connectionString: url, max: 5, idleTimeoutMillis: 10_000, ssl: /sslmode=require|neon\.tech/.test(url) ? { rejectUnauthorized: true } : undefined });
+    const conSsl = /sslmode=(require|verify-full)|neon\.tech/.test(url);
+    // El SSL se configura aquí (verificando el certificado); se quita sslmode de la URL para evitar el aviso de pg.
+    const limpia = url.replace(/([?&])(sslmode|channel_binding)=[^&]*&?/g, '$1').replace(/[?&]$/, '');
+    pool = new pg.Pool({ connectionString: limpia, max: 5, idleTimeoutMillis: 10_000, ssl: conSsl ? { rejectUnauthorized: true } : undefined });
   }
   return pool;
 }

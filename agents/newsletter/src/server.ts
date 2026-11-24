@@ -44,6 +44,13 @@ function crearServidorMcp() {
     inputSchema: { peticion_id: z.string().uuid(), emails: z.string().describe('Direcciones separadas por comas'), actor: z.string().email().optional() },
   }, seguro((a) => svc.enviarPrueba(a.peticion_id, a.emails, a.actor)));
 
+  s.registerTool('listar_newsletters', {
+    title: 'Últimas newsletters',
+    description: 'Últimas peticiones de newsletter (opcionalmente de una persona), con su estado y fecha de envío prevista.',
+    inputSchema: { solicitante: z.string().email().optional(), limite: z.number().int().min(1).max(20).optional() },
+    annotations: { readOnlyHint: true },
+  }, seguro((a) => svc.listar(a)));
+
   s.registerTool('estado_campana', {
     title: 'Estado de la campaña',
     description: 'Estado de una petición: tarea en curso, versiones, borradores, pruebas enviadas e historial.',
@@ -139,6 +146,7 @@ export function crearApp() {
   app.post('/v1/newsletters', ruta((r) => svc.crear(r.body, 'n8n'), 202));
   app.post('/v1/newsletters/:id/regenerar', ruta((r) => svc.regenerar(String(r.params.id), String(r.body?.feedback ?? ''), r.body?.actor, 'n8n', r.body?.enfoque), 202));
   app.post('/v1/newsletters/:id/prueba', ruta((r) => svc.enviarPrueba(String(r.params.id), String(r.body?.emails ?? ''), r.body?.actor)));
+  app.get('/v1/newsletters', ruta((r) => svc.listar({ solicitante: r.query.solicitante ? String(r.query.solicitante) : undefined, limite: r.query.limite ? Number(r.query.limite) : undefined })));
   app.get('/v1/newsletters/:id', ruta((r) => svc.estado({ peticion_id: String(r.params.id) })));
   app.get('/v1/tareas/:id', ruta((r) => svc.estado({ tarea_id: String(r.params.id) })));
   app.post('/v1/newsletters/:id/cancelar', ruta((r) => apr.cancelarProgramacion(String(r.params.id), String(r.body?.actor ?? ''), r.body?.motivo)));
