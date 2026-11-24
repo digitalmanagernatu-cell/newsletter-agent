@@ -92,7 +92,7 @@ export function crearApp() {
   app.post('/aprobar', async (req, res) => {
     try {
       const r = await apr.aprobarYProgramar(String(req.body.t ?? ''), String(req.body.email ?? ''), String(req.body.fecha ?? '') || undefined);
-      html(res, 200, paginaResultado('Newsletter programada', `<p>Se enviará el <strong>${h(r.fecha)}</strong>.</p><p>Aprobada por ${h(r.aprobador)}. Recibiréis la confirmación por email.</p><p><a href="${h(r.url_campana)}">Ver la campaña en Mailrelay</a></p>`));
+      html(res, 200, paginaResultado('Newsletter programada', `<p>Se enviará el <strong>${h(r.fecha)}</strong> a ${h(r.destino)}.</p>${r.aviso ? `<p>⚠️ ${h(r.aviso)}</p>` : ''}<p>Aprobada por ${h(r.aprobador)}. Recibiréis la confirmación por email.</p>${r.url_campana ? `<p><a href="${h(r.url_campana)}">Ver la campaña</a></p>` : ''}`));
     } catch (err) { fallo(res, err); }
   });
   app.get('/cambios', async (req, res) => {

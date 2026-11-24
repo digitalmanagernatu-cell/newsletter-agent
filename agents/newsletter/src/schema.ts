@@ -21,6 +21,8 @@ export const PeticionSchema = z.object({
   /** Imágenes subidas en el formulario de n8n (base64). Se suben a la plataforma y pasan a `imagenes`. */
   adjuntos: z.array(z.object({ nombre: z.string(), contenido_base64: z.string().max(14_000_000), descripcion: z.string().optional() })).default([]),
   idioma: z.enum(['es', 'it', 'fr', 'ro', 'en']).default('es'),
+  /** NATU: idiomas en los que sale (una campaña por idioma, cada una a su segmento). BetrésON: siempre español. */
+  idiomas: z.array(z.enum(['es', 'it', 'fr', 'ro', 'en'])).min(1).optional(),
   propuestas: z.union([z.literal(1), z.literal(2)]).default(1),
   solicitante_email: z.string().email().optional(),
   /** Direcciones extra para la prueba (campo libre del formulario). Solo se aceptan dominios de la empresa. */
@@ -60,6 +62,14 @@ export const BloqueSchema = z.discriminatedUnion('block', [
   z.object({ block: z.literal('bullets'), items_html: z.array(z.string()).min(1) }),
   z.object({ block: z.literal('highlight_box'), html: z.string() }),
   z.object({ block: z.literal('quote'), text: z.string(), author: z.string().optional() }),
+  z.object({
+    block: z.literal('offer'),
+    eyebrow: z.string().optional(),
+    value: z.string().max(12),
+    caption: z.string().optional(),
+    dates: z.string().optional(),
+    background: z.string().optional(),
+  }),
   z.object({ block: z.literal('banner'), text: z.string(), background: z.string().optional(), color: z.string().optional() }),
   z.object({
     block: z.literal('product_rows'),

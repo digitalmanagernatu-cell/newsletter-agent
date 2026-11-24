@@ -16,6 +16,8 @@ export interface Kit {
   fuenteSerif: string;
   c: { texto: string; titular: string; suave: string; fondo: string; fondoPie: string; separador: string; acento: string; boton: string; botonTexto: string };
   logo: { url: string; ancho: number; alt: string };
+  fondoExterior: string;
+  fuenteWeb?: { nombre: string; url: string };
   etiquetaBaja: string;
   palabrasProhibidas: Record<string, string>;
 }
@@ -32,19 +34,22 @@ export function cargarKit(marca: Marca): Kit {
         acento: raw.colores.dorado.hex, boton: raw.colores.negro.hex, botonTexto: '#FFFFFF',
       },
       logo: { url: raw.logo.url_publica_mailrelay, ancho: raw.logo.ancho_cabecera_px, alt: 'Betrés ON' },
+      fondoExterior: '#FFFFFF',
       etiquetaBaja: raw.pie.etiqueta_baja_mailrelay,
       palabrasProhibidas: raw.palabras_prohibidas ?? {},
     };
   }
   return {
     marca, raw, nombre: 'NATU Laboratories', ancho: raw.layout.ancho_max_px, margen: raw.layout.margen_lateral_px,
-    fuente: "Montserrat, Arial, Helvetica, sans-serif", fuenteSerif: "Georgia, 'Times New Roman', serif",
+    fuente: 'Montserrat, Arial, Helvetica, sans-serif', fuenteSerif: "Georgia, 'Times New Roman', serif",
     c: {
-      texto: raw.colores.principal_oscuro.hex, titular: raw.colores.principal_oscuro.hex, suave: '#6B6B6A',
-      fondo: '#FFFFFF', fondoPie: raw.colores.principal_claro.hex, separador: raw.colores.principal_claro.hex,
-      acento: raw.colores.rosa.hex, boton: raw.boton.fondo, botonTexto: raw.boton.texto,
+      texto: raw.colores.principal_oscuro.hex, titular: raw.colores.principal_oscuro.hex, suave: '#7A7B7A',
+      fondo: raw.colores.blanco.hex, fondoPie: raw.colores.verde_salvia.hex, separador: raw.colores.principal_claro.hex,
+      acento: raw.colores.dorado.hex, boton: raw.boton.fondo, botonTexto: raw.boton.texto,
     },
-    logo: { url: raw.logo.url_publica ?? '', ancho: raw.logo.ancho_cabecera_px, alt: 'NATU Laboratories' },
+    logo: { url: raw.logo.url_publica, ancho: raw.logo.ancho_cabecera_px, alt: 'NATU Laboratories' },
+    fondoExterior: raw.colores.principal_claro.hex,
+    fuenteWeb: { nombre: 'Montserrat', url: raw.tipografias.titulares.google_fonts },
     etiquetaBaja: raw.mailchimp.etiqueta_baja,
     palabrasProhibidas: raw.palabras_prohibidas ?? {},
   };

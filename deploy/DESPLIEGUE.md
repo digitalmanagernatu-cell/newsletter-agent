@@ -69,3 +69,21 @@ En Mailrelay existe el grupo **"Prueba agente"** (id 12) con una sola dirección
 - Agente desplegado en `https://news.agentes.natulaboratories.es` (contenedor `natu-agent-newsletter`).
 - Formulario del equipo: https://natulab.app.n8n.cloud/form/9fa52642-3a57-412d-82da-3bdcb96aaf70 (n8n cambia la ruta al importar).
 - Prueba completa: formulario → borrador 86 en Mailrelay → prueba → email de aprobación (Outlook) → "Pedir cambios" → ronda 2 con el mismo borrador actualizado.
+
+## Fase 4 (NATU / Mailchimp)
+
+1. Añadir la clave de Mailchimp al `.env` del servidor (se escribe sin que se vea):
+
+```bash
+read -r -s -p "Clave de Mailchimp: " K; echo; printf 'MAILCHIMP_DC=us13\nMAILCHIMP_API_KEY=%s\n' "$K" >> /opt/natu-agentes/.env; unset K
+```
+
+2. Actualizar y reiniciar:
+
+```bash
+cd /opt/natu-agentes && git pull && docker compose up -d --build
+```
+
+3. n8n:
+   - En *Newsletter – Eventos del agente*, sustituir el código del nodo **Construir email** por `n8n/construir-email.js`.
+   - Importar `n8n/newsletter-natu-peticion.json`, elegir la credencial "Agente newsletter" en *Enviar al agente*, guardar y activar.

@@ -37,6 +37,15 @@ ${b.subtitle ? `<mj-text align="${b.align}" padding="8px ${k.margen}px 0" font-s
       return `<mj-section padding="16px ${k.margen}px"><mj-column background-color="${k.c.fondoPie}" border-left="4px solid ${k.c.acento}"><mj-text padding="20px 24px" align="left">${inline(b.html, k)}</mj-text></mj-column></mj-section>`;
     case 'quote':
       return `<mj-section padding="24px 0"><mj-column><mj-text align="center" padding="${pad(k)}" font-family="${k.fuenteSerif}" font-style="italic" font-size="22px" line-height="1.4" color="${k.c.titular}">“${esc(b.text)}”</mj-text>${b.author ? `<mj-text align="center" padding="8px ${k.margen}px 0" font-size="12px" letter-spacing="2px" text-transform="uppercase" color="${k.c.suave}">${esc(b.author)}</mj-text>` : ''}</mj-column></mj-section>`;
+    case 'offer': {
+      const fondo = b.background ?? k.c.titular;
+      return `<mj-section padding="8px 0 32px" background-color="${fondo}"><mj-column>
+${b.eyebrow ? `<mj-text align="center" color="#FFFFFF" font-size="13px" font-weight="700" letter-spacing="4px" text-transform="uppercase" padding="0 ${k.margen}px">${esc(b.eyebrow)}</mj-text>` : ''}
+<mj-text align="center" color="${k.c.acento}" font-size="88px" line-height="1" font-weight="800" padding="8px ${k.margen}px 0">${esc(b.value)}</mj-text>
+${b.caption ? `<mj-text align="center" color="#FFFFFF" font-size="18px" font-weight="600" padding="10px ${k.margen}px 0">${esc(b.caption)}</mj-text>` : ''}
+${b.dates ? `<mj-text align="center" padding="20px ${k.margen}px 0"><span style="display:inline-block;border:1px solid ${k.c.acento};color:${k.c.acento};padding:12px 20px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">${esc(b.dates)}</span></mj-text>` : ''}
+</mj-column></mj-section>`;
+    }
     case 'banner':
       return `<mj-section padding="0" background-color="${b.background ?? k.c.acento}"><mj-column><mj-text align="center" padding="12px ${k.margen}px" font-size="13px" letter-spacing="3px" font-weight="bold" text-transform="uppercase" color="${b.color ?? '#ffffff'}">${esc(b.text)}</mj-text></mj-column></mj-section>`;
     case 'product_rows':

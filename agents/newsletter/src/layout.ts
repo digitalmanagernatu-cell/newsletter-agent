@@ -5,6 +5,11 @@ import { esc } from './blocks/html.js';
 
 /** Partes fijas por marca: cabecera y pie. El cuerpo es libre. */
 function cabecera(kit: Kit): string {
+  if (kit.marca === 'natu') {
+    return `<mj-section padding="28px 0 20px" background-color="${kit.c.titular}"><mj-column>
+<mj-image src="${kit.logo.url}" alt="${esc(kit.logo.alt)}" width="${kit.logo.ancho}px" padding="0" />
+</mj-column></mj-section>`;
+  }
   return `<mj-section padding="20px 0 16px" background-color="${kit.c.fondo}"><mj-column>
 <mj-image src="${kit.logo.url}" alt="${esc(kit.logo.alt)}" width="${kit.logo.ancho}px" padding="0" />
 </mj-column></mj-section>`;
@@ -16,10 +21,14 @@ const ICONOS: Record<string, string> = {
   tiktok: 'https://assets.ipzmarketing.com/assets/social-buttons/tiktok.png',
 };
 
-function pie(kit: Kit): string {
-  if (kit.marca !== 'betreson') {
-    return `<mj-section background-color="${kit.c.fondoPie}" padding="24px 0"><mj-column>
-<mj-text align="center" font-size="11px" color="${kit.c.suave}">[PIE LEGAL NATU PENDIENTE] · <a href="${kit.etiquetaBaja}" style="color:inherit;">Darse de baja</a></mj-text>
+function pie(kit: Kit, idioma: string): string {
+  if (kit.marca === 'natu') {
+    const p = kit.raw.pie;
+    const l = (o: Record<string, string>) => o[idioma] ?? o.es;
+    return `<mj-section background-color="${kit.c.titular}" padding="28px 0 24px"><mj-column>
+<mj-text align="center" color="#FFFFFF" font-size="12px" font-weight="700" letter-spacing="1px" padding="0 ${kit.margen}px">${esc(p.empresa)}</mj-text>
+<mj-text align="center" color="#D9D9D9" font-size="11px" padding="4px ${kit.margen}px 0">${esc(l(p.ciudad))}</mj-text>
+<mj-text align="center" color="#D9D9D9" font-size="11px" padding="16px ${kit.margen}px 0">${esc(l(p.motivo))}<br/><a href="${kit.etiquetaBaja}" style="color:${kit.c.acento};text-decoration:underline;">${esc(l(p.baja))}</a></mj-text>
 </mj-column></mj-section>`;
   }
   const p = kit.raw.pie;
@@ -38,11 +47,12 @@ function pie(kit: Kit): string {
 </mj-column></mj-section>`;
 }
 
-export function componerMjml(kit: Kit, comp: Composicion): string {
+export function componerMjml(kit: Kit, comp: Composicion, idioma = 'es'): string {
   const acento = comp.acento ?? kit.c.acento;
   const cuerpo = comp.bloques.map((b, i) => `<!-- bloque ${i + 1}: ${b.block} -->\n${renderBloque(b, { kit, acento, indice: i })}`).join('\n');
-  return `<mjml lang="es">
+  return `<mjml lang="${idioma}">
 <mj-head>
+  ${kit.fuenteWeb ? `<mj-font name="${kit.fuenteWeb.nombre}" href="${kit.fuenteWeb.url}" />` : ''}
   <mj-title>${esc(comp.asunto)}</mj-title>
   <mj-preview>${esc(comp.preheader)}</mj-preview>
   <mj-attributes>
@@ -52,10 +62,10 @@ export function componerMjml(kit: Kit, comp: Composicion): string {
   </mj-attributes>
   <mj-style>a { color: ${kit.c.titular}; } p { margin: 0 0 14px; } @media (max-width:480px){ .foto-producto img { max-width:220px !important; margin:0 auto; } }</mj-style>
 </mj-head>
-<mj-body width="${kit.ancho}px" background-color="#ffffff">
+<mj-body width="${kit.ancho}px" background-color="${kit.fondoExterior}">
 ${cabecera(kit)}
 ${cuerpo}
-${pie(kit)}
+${pie(kit, idioma)}
 </mj-body>
 </mjml>`;
 }

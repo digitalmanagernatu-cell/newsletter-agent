@@ -7,6 +7,7 @@ if [ -f .env ]; then echo ".env ya existe. Bórralo antes si quieres regenerarlo
 leer() { local v; read -r -s -p "$1: " v; echo >&2; printf '%s' "$v"; }
 OPENAI=$(leer "Clave de OpenAI (sk-...)")
 MAILRELAY=$(leer "Clave de API de Mailrelay")
+MAILCHIMP=$(leer "Clave de API de Mailchimp (termina en -us13)")
 DBURL=$(leer "Cadena de conexión de Neon (postgresql://...)")
 N8NURL=https://natulab.app.n8n.cloud/webhook/natu-newsletter-eventos
 umask 077
@@ -17,6 +18,8 @@ OPENAI_API_KEY=${OPENAI}
 LLM_MODEL=gpt-5.4
 MAILRELAY_ACCOUNT=betreson.ipzmarketing.com
 MAILRELAY_API_KEY=${MAILRELAY}
+MAILCHIMP_DC=us13
+MAILCHIMP_API_KEY=${MAILCHIMP}
 DATABASE_URL=${DBURL}
 AGENT_API_KEYS=$(openssl rand -hex 32)
 APPROVAL_SECRET=$(openssl rand -hex 48)

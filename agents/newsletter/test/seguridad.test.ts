@@ -41,3 +41,12 @@ test('programar envía scheduled_at en UTC con el formato de Mailrelay', async (
     globalThis.fetch = original;
   }
 });
+
+test('Mailchimp: redondeo a cuartos de hora y sin método de envío inmediato', async () => {
+  const { redondearCuarto, Mailchimp } = await import('../src/plataformas/mailchimp.js');
+  assert.equal(redondearCuarto(new Date('2030-01-01T09:37:00Z')).fecha.toISOString(), '2030-01-01T09:30:00.000Z');
+  assert.equal(redondearCuarto(new Date('2030-01-01T09:38:00Z')).fecha.toISOString(), '2030-01-01T09:45:00.000Z');
+  assert.equal(redondearCuarto(new Date('2030-01-01T09:45:00Z')).ajustada, false);
+  const metodos = Object.getOwnPropertyNames(Mailchimp.prototype).join(' ') + ' ' + Object.keys(new Mailchimp('us1', 'k')).join(' ');
+  assert.doesNotMatch(metodos, /enviarYa|enviarAhora|sendNow|actionsSend/i);
+});

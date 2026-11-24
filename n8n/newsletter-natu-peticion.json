@@ -1,0 +1,207 @@
+{
+  "name": "Newsletter NATU – Petición",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Nueva newsletter NATU",
+        "formDescription": "Clientes de NATU Granel en Mailchimp. Se crea una campaña por idioma (cada una a su segmento GRANEL), con el texto adaptado, no traducido. Te llegará una prueba por idioma y después el email de aprobación.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Tipo de campaña",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Lanzamiento"
+                  },
+                  {
+                    "option": "Promoción"
+                  },
+                  {
+                    "option": "Estacional"
+                  },
+                  {
+                    "option": "Informativa"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Idiomas",
+              "fieldType": "dropdown",
+              "multiselect": true,
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Español"
+                  },
+                  {
+                    "option": "Italiano"
+                  },
+                  {
+                    "option": "Francés"
+                  },
+                  {
+                    "option": "Rumano"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Objetivo",
+              "fieldType": "textarea",
+              "placeholder": "¿Qué queremos conseguir con esta newsletter?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Asunto sugerido",
+              "placeholder": "Opcional"
+            },
+            {
+              "fieldLabel": "Mensaje y textos clave",
+              "fieldType": "textarea",
+              "placeholder": "Mensaje principal, condiciones, fechas, precios… Todo lo que deba aparecer.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Productos",
+              "fieldType": "textarea",
+              "placeholder": "Uno por línea: Nombre | Descripción | URL del producto | URL de la imagen"
+            },
+            {
+              "fieldLabel": "Imágenes",
+              "fieldType": "file",
+              "multipleFiles": true,
+              "acceptFileTypes": ".jpg,.jpeg,.png,.gif,.webp"
+            },
+            {
+              "fieldLabel": "URLs de imágenes",
+              "fieldType": "textarea",
+              "placeholder": "Opcional. Una URL pública por línea (enlaces directos a la imagen)"
+            },
+            {
+              "fieldLabel": "Fecha de envío",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Hora de envío",
+              "placeholder": "09:30 (hora de Madrid; Mailchimp usa :00, :15, :30 o :45)",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Propuestas",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1 propuesta"
+                  },
+                  {
+                    "option": "2 propuestas (editorial y comercial)"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tu email",
+              "fieldType": "email",
+              "placeholder": "nombre@natuaromatic.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Enviar la prueba también a",
+              "placeholder": "Opcional. Emails de la empresa separados por comas"
+            }
+          ]
+        },
+        "options": {
+          "buttonLabel": "Crear newsletter",
+          "appendAttribution": false,
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "¡Recibido! En unos minutos te llegarán las pruebas (una por idioma) y el email de aprobación."
+            }
+          }
+        }
+      },
+      "id": "efdadcad-b819-4e22-86cb-83b3c0b01f89",
+      "name": "Formulario NATU",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "b3f9ac08-556d-45ff-9ea3-73cf9643943e"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Convierte las respuestas del formulario en la petición que espera el agente.\nconst f = $input.first().json;\nconst campo = (etiqueta) => (f[etiqueta] ?? '').toString().trim();\n\nconst tipos = { 'Lanzamiento': 'lanzamiento', 'Promoción': 'promo', 'Estacional': 'estacional', 'Informativa': 'informativa' };\nconst lineas = (t) => t.split(/\\r?\\n/).map((l) => l.trim()).filter(Boolean);\n\n// Productos: una línea por producto → Nombre | Descripción | URL del producto | URL de la imagen\nconst productos = lineas(campo('Productos')).map((l) => {\n  const [nombre, descripcion, url, imagen] = l.split('|').map((x) => (x ?? '').trim());\n  const p = { nombre };\n  if (descripcion) p.descripcion = descripcion;\n  if (/^https?:\\/\\//.test(url ?? '')) p.url = url;\n  if (/^https?:\\/\\//.test(imagen ?? '')) p.imagen = imagen;\n  return p;\n}).filter((p) => p.nombre);\n\nconst imagenes = lineas(campo('URLs de imágenes')).filter((u) => /^https?:\\/\\//.test(u)).map((url) => ({ url }));\n\n// Imágenes subidas en el formulario → base64 (el agente las sube a Mailrelay).\nconst adjuntos = [];\nconst binarios = $input.first().binary ?? {};\nfor (const clave of Object.keys(binarios)) {\n  const buffer = await this.helpers.getBinaryDataBuffer(0, clave);\n  adjuntos.push({ nombre: binarios[clave].fileName ?? `${clave}.jpg`, contenido_base64: buffer.toString('base64') });\n}\n\nconst mensaje = campo('Mensaje y textos clave');\nconst fecha = campo('Fecha de envío').slice(0, 10);\nconst hora = (campo('Hora de envío').match(/^(\\d{1,2})[:.](\\d{2})/) ?? [null, '09', '00']).slice(1).map((x) => x.padStart(2, '0')).join(':');\n\nreturn [{ json: {\n  marca: 'natu',\n  idiomas: (Array.isArray(f['Idiomas']) ? f['Idiomas'] : campo('Idiomas').split(','))\n    .map((x) => ({ 'Español': 'es', 'Italiano': 'it', 'Francés': 'fr', 'Rumano': 'ro', 'Inglés': 'en' })[String(x).trim()])\n    .filter(Boolean),\n  tipo_campana: tipos[campo('Tipo de campaña')] ?? 'informativa',\n  objetivo: campo('Objetivo'),\n  asunto_sugerido: campo('Asunto sugerido') || undefined,\n  mensaje,\n  textos_clave: [],\n  productos,\n  imagenes,\n  adjuntos,\n  idioma: 'es',\n  propuestas: campo('Propuestas').startsWith('2') ? 2 : 1,\n  solicitante_email: campo('Tu email').toLowerCase(),\n  destinatarios_prueba: campo('Enviar la prueba también a') || undefined,\n  fecha_envio: `${fecha}T${hora}`,\n} }];"
+      },
+      "id": "6a332876-54bd-4562-81d1-2800cd3d5883",
+      "name": "Preparar petición",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://news.agentes.natulaboratories.es/v1/newsletters",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "64d0a3dc-97c1-47e9-83dd-e58f6f8cdb20",
+      "name": "Enviar al agente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Formulario NATU": {
+      "main": [
+        [
+          {
+            "node": "Preparar petición",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar petición": {
+      "main": [
+        [
+          {
+            "node": "Enviar al agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid"
+  },
+  "pinData": {}
+}

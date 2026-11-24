@@ -20,65 +20,64 @@
   "logo": {
     "principal": "assets/logo-cuadrado.png",
     "simbolo": "assets/simbolo-hoja.png",
-    "notas": "Versión principal: blanco sobre cuadrado gris oscuro. Versión limpia: gris oscuro sobre fondo claro. No recolorear, no deformar, no inclinar, respetar área de seguridad (X = altura de la 'a'; 2X arriba/abajo, X laterales). Tamaño mínimo impreso 8 mm; en email no menos de 80 px de ancho.",
-    "ancho_cabecera_px": 120
+    "url_publica": "https://mcusercontent.com/cc5d0ca94891f9e3fde91b9e0/images/ca8882c9-d022-e390-3eaf-8e8186b9ec83.png",
+    "notas": "En email: logo blanco sobre cabecera gris oscuro #3E3F3E, 110 px de ancho. No recolorear ni deformar.",
+    "ancho_cabecera_px": 110
   },
   "colores": {
     "principal_oscuro": {
-      "hex": "#373736",
-      "uso": "texto principal, cabecera/pie, botones"
+      "hex": "#3E3F3E",
+      "uso": "cabecera, pie, titulares, botones"
     },
     "principal_claro": {
-      "hex": "#DBD7D2",
-      "uso": "fondos de sección, separadores"
+      "hex": "#DAD7D1",
+      "uso": "fondo exterior, separadores"
+    },
+    "dorado": {
+      "hex": "#CCAB68",
+      "uso": "acento: cifras de descuento, fechas, enlaces destacados"
+    },
+    "verde_salvia": {
+      "hex": "#D3D7C4",
+      "uso": "cajas de argumentos ('por qué pedir ahora')"
+    },
+    "arena": {
+      "hex": "#DCD5BE",
+      "uso": "fichas de referencias, bloques de producto"
     },
     "rosa": {
       "hex": "#F39C98",
-      "uso": "acento: perfumería, promociones"
-    },
-    "melocoton": {
-      "hex": "#F0BAA4",
-      "uso": "acento: cosmética"
-    },
-    "verde_salvia": {
-      "hex": "#D0D6C3",
-      "uso": "acento: ambientación, fondos"
-    },
-    "arena": {
-      "hex": "#DFD6BE",
-      "uso": "fondos cálidos, bloques editoriales"
+      "uso": "acento secundario (perfumería), con moderación"
     },
     "blanco": {
       "hex": "#FFFFFF",
       "uso": "fondo del cuerpo"
     },
-    "pendiente_confirmar": "El brandbook da hex distintos de su propio RGB (p. ej. #e2a29a frente a R243 G156 B152). Se usan los valores RGB; confirmar con diseño."
+    "nota": "Paleta tomada de las campañas de Mailchimp de noviembre de 2026 (el brandbook da hex inconsistentes)."
   },
   "tipografias": {
     "titulares": {
       "web": "Montserrat",
       "pesos": [
-        300,
         400,
         600,
-        900
+        700,
+        800
       ],
-      "google_fonts": true,
+      "google_fonts": "https://fonts.googleapis.com/css?family=Montserrat:400,600,700,800",
       "fallback": "Arial, Helvetica, sans-serif"
     },
     "cuerpo": {
       "web": "Montserrat",
       "pesos": [
-        300,
         400
       ],
       "fallback": "Arial, Helvetica, sans-serif"
     },
     "complementaria": {
-      "web": "Athelas",
-      "uso": "citas y acentos editoriales en cursiva",
-      "fallback": "Georgia, 'Times New Roman', serif",
-      "nota": "Athelas no es fuente web libre: en email se usa siempre Georgia."
+      "web": "Georgia",
+      "uso": "acentos editoriales en cursiva",
+      "fallback": "Georgia, 'Times New Roman', serif"
     }
   },
   "layout": {
@@ -87,31 +86,87 @@
     "espaciado_bloques_px": 32
   },
   "boton": {
-    "fondo": "#373736",
+    "fondo": "#3E3F3E",
     "texto": "#FFFFFF",
     "radio_px": 0,
-    "padding": "14px 28px",
+    "padding": "16px 40px",
     "mayusculas": true,
     "espaciado_letras": "2px",
-    "fuente": "Montserrat 600"
+    "fuente": "Montserrat 700"
   },
-  "tono": "Profesional, cercano y experto. Destacar I+D+i, calidad, capacidad industrial, tendencias de mercado y servicio 360°. Sin superlativos vacíos.",
-  "pie_legal": "PENDIENTE: razón social, CIF, dirección, texto RGPD, redes sociales. Enlace de baja: *|UNSUB|*",
+  "tono": "Profesional, cercano y directo. Beneficio para el negocio del cliente (rotación, margen, tiempo de entrega, novedades olfativas). Datos concretos y claros. Sin superlativos vacíos.",
   "pendiente": [
-    "pie legal",
-    "redes sociales",
-    "confirmar hex",
-    "newsletters de ejemplo"
+    "segmento GRANEL EN"
   ],
   "mailchimp": {
     "list_id": "269aad017f",
+    "from_name": "Laboratorios Natuaromatic",
+    "reply_to": "info@natuaromatic.com",
     "segmentos_por_idioma": {
       "es": 7222685,
       "it": 7222686,
       "fr": 7222687,
       "ro": 7222688,
-      "en": "PENDIENTE (GRANEL EN, lo crea Irene)"
+      "en": null
+    },
+    "nombres_segmento": {
+      "es": "GRANEL ES",
+      "it": "GRANEL IT",
+      "fr": "GRANEL FR",
+      "ro": "GRANEL RO",
+      "en": "GRANEL EN (pendiente de crear)"
     },
     "etiqueta_baja": "*|UNSUB|*"
+  },
+  "audiencia": "Clientes B2B de NATU Granel: tiendas y negocios que compran fragancia a granel (formato 1 litro, etc.) para revender o elaborar. Se les habla de tú (o su equivalente natural en cada idioma) como proveedor experto y cercano.",
+  "estructura_habitual": [
+    "Cabecera gris oscuro con logo blanco y, a veces, la oferta principal (antetítulo en mayúsculas, cifra grande en dorado, fechas en recuadro dorado)",
+    "Saludo breve y 2 párrafos con negritas en lo esencial",
+    "Bloque de producto o referencias (fichas arena o fotos con nombre de fragancia)",
+    "Caja verde salvia con argumentos",
+    "Botón oscuro 'Hacer mi pedido' a la tienda B2B",
+    "Condiciones en letra pequeña",
+    "Pie gris oscuro con razón social, ciudad, motivo y baja"
+  ],
+  "cta": {
+    "enlace": "https://b2b.natuaromatic.com",
+    "texto": {
+      "es": "Hacer mi pedido",
+      "it": "Ordina ora",
+      "fr": "Passer ma commande",
+      "ro": "Plasează comanda",
+      "en": "Place my order"
+    }
+  },
+  "pie": {
+    "empresa": "LABORATORIOS NATUAROMATIC S.L.",
+    "ciudad": {
+      "es": "Las Torres de Cotillas, Murcia · España",
+      "it": "Las Torres de Cotillas, Murcia · Spagna",
+      "fr": "Las Torres de Cotillas, Murcie · Espagne",
+      "ro": "Las Torres de Cotillas, Murcia · Spania",
+      "en": "Las Torres de Cotillas, Murcia · Spain"
+    },
+    "motivo": {
+      "es": "Recibes este email porque eres cliente de NATU Granel.",
+      "it": "Ricevi questa email perché sei cliente NATU per i profumi sfusi.",
+      "fr": "Vous recevez cet e-mail car vous êtes client NATU pour le parfum en vrac.",
+      "ro": "Primiți acest e-mail deoarece sunteți client NATU pentru parfumuri vrac.",
+      "en": "You are receiving this email because you are a NATU bulk fragrance customer."
+    },
+    "baja": {
+      "es": "Darse de baja",
+      "it": "Annulla l’iscrizione",
+      "fr": "Se désabonner",
+      "ro": "Dezabonare",
+      "en": "Unsubscribe"
+    }
+  },
+  "nombre_idioma": {
+    "es": "español",
+    "it": "italiano",
+    "fr": "francés",
+    "ro": "rumano",
+    "en": "inglés"
   }
 }

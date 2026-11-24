@@ -61,3 +61,12 @@ Ejemplo de resultado: `examples/salida-pets-navidad/` (datos ficticios).
 ### Base de datos
 
 Proyecto Neon `natu-agentes` (Frankfurt), base `natu_agentes`. Esquemas `shared` (tareas, eventos, costes, aprobaciones) y `newsletter` (peticiones, versiones, campañas). Migraciones en `/shared/migrations` (`npm run migrate` desde la raíz).
+
+## Fase 4: NATU en Mailchimp, multi-idioma
+
+- Petición con `marca: "natu"` e `idiomas` (`es`, `it`, `fr`, `ro`; `en` cuando exista el segmento GRANEL EN).
+- Por cada propuesta se genera una **versión maestra en español** y se **adapta** (no traduce) a cada idioma; cada versión pasa su propia revisión visual, que también busca restos de otro idioma.
+- Un borrador de Mailchimp por idioma, en la audiencia NATU y su segmento guardado (GRANEL ES/IT/FR/RO), carpeta "Agente newsletters". Imágenes al File Manager.
+- Pruebas con `actions/test`. Una aprobación programa **todos los idiomas** de la propuesta (`actions/schedule`), redondeando a :00/:15/:30/:45 y avisando del ajuste. Si falla uno, se desprograman los demás y el enlace sigue sirviendo. Antes se comprueba el `send-checklist` y que cada campaña apunta a su segmento.
+- Capa común de plataformas en `src/plataformas/index.ts` (Mailrelay y Mailchimp con la misma interfaz).
+- Variables de prueba: `MAILRELAY_GROUP_IDS` y `MAILCHIMP_SEGMENT_OVERRIDE` fuerzan un grupo/segmento interno.

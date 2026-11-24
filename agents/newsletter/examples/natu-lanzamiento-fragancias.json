@@ -1,0 +1,14 @@
+{
+  "marca": "natu",
+  "tipo_campana": "lanzamiento",
+  "objetivo": "EJEMPLO DE PRUEBA (datos ficticios basados en el lanzamiento de noviembre). Dar a conocer tres fragancias nuevas a los clientes de granel y que hagan pedido con el 15% de descuento.",
+  "mensaje": "Lanzamos tres fragancias nuevas en formato granel: 2038 Sage & Vanilla, 8024 Fresia & Apple y 124 Silk Blossom. 15% de descuento en estas referencias hasta el 5 de diciembre de 2026. Pedidos en la tienda B2B.",
+  "textos_clave": ["15% de descuento en las tres novedades", "Válido hasta el 5 de diciembre de 2026"],
+  "productos": [
+    { "nombre": "2038 – Sage & Vanilla", "descripcion": "Oriental amaderada. Salida: cardamomo, bergamota. Corazón: hojas de violeta, lavanda, salvia. Fondo: vainilla, cuero, notas amaderadas, pachulí.", "imagen": "https://mcusercontent.com/cc5d0ca94891f9e3fde91b9e0/images/a26808bc-0cd7-9523-b70f-2a0840f2a9c0.jpg" },
+    { "nombre": "8024 – Fresia & Apple", "descripcion": "Floral frutal gourmand. Salida: fresia, limón italiano, flor del nectarino, manzana. Corazón: fresa, malvavisco, coco, azahar. Fondo: crema batida, azúcar, vainilla, almizcle, frambuesa, ámbar.", "imagen": "https://mcusercontent.com/cc5d0ca94891f9e3fde91b9e0/images/8c03ae30-6868-1707-cd2e-31a2730e7035.jpg" },
+    { "nombre": "124 – Silk Blossom", "descripcion": "Mikado que difunde su perfume y crea un ambiente agradable y acogedor.", "imagen": "https://mcusercontent.com/cc5d0ca94891f9e3fde91b9e0/images/102f396d-79fd-7724-be1c-c5e6bf7253fe.jpg" }
+  ],
+  "idiomas": ["es", "it", "fr", "ro"],
+  "propuestas": 1
+}

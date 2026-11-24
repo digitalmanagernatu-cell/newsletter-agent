@@ -15,23 +15,28 @@ img{max-width:100%;height:auto;display:block;border:1px solid var(--b)}.ok{color
 </style></head><body><main>${cuerpo}</main></body></html>`;
 }
 
-export function paginaAprobar(t: string, d: { asunto: string; preheader: string; enfoque: string; captura_url: string; destino: string; fecha_envio: string | null; objetivo: string }) {
+const IDIOMAS: Record<string, string> = { es: 'Español', it: 'Italiano', fr: 'Francés', ro: 'Rumano', en: 'Inglés' };
+
+export function paginaAprobar(t: string, d: { enfoque: string; destino: string; fecha_envio: string | null; objetivo: string; plataforma: string; versiones: { idioma: string; asunto: string; preheader: string; captura_url: string }[] }) {
   const fecha = (d.fecha_envio ?? '').replace(' ', 'T').slice(0, 16);
+  const varios = d.versiones.length > 1;
   return marco('Aprobar y programar', `
 <h1>Aprobar y programar newsletter</h1>
-<div class="card"><div class="meta">Propuesta ${e(d.enfoque)} · Destino: <strong>${e(d.destino)}</strong></div>
-<p><strong>${e(d.asunto)}</strong><br><span class="meta">${e(d.preheader)}</span></p>
+<div class="card"><div class="meta">Propuesta ${e(d.enfoque)} · ${e(d.plataforma === 'mailchimp' ? 'Mailchimp' : 'Mailrelay')}${varios ? ` · ${d.versiones.length} idiomas` : ''}</div>
+<p class="meta">Destino: <strong>${e(d.destino)}</strong></p>
+${d.versiones.map((v) => `<p>${varios ? `<span class="meta">${e(IDIOMAS[v.idioma] ?? v.idioma)}</span><br>` : ''}<strong>${e(v.asunto)}</strong><br><span class="meta">${e(v.preheader)}</span></p>`).join('')}
 <p class="meta">${e(d.objetivo)}</p></div>
 <form method="post" action="/aprobar">
 <input type="hidden" name="t" value="${e(t)}">
 <label for="fecha">Fecha y hora de envío (hora de Madrid)</label>
-<input id="fecha" name="fecha" type="datetime-local" value="${e(fecha)}" required>
+<input id="fecha" name="fecha" type="datetime-local" value="${e(fecha)}" ${d.plataforma === 'mailchimp' ? 'step="900"' : ''} required>
+${d.plataforma === 'mailchimp' ? '<p class="meta">Mailchimp solo programa en :00, :15, :30 y :45. Si eliges otra hora, se ajustará al cuarto de hora más cercano.</p>' : ''}
 <label for="email">Tu email de la empresa</label>
 <input id="email" name="email" type="email" autocomplete="email" required placeholder="nombre@natuaromatic.com">
-<button type="submit">Aprobar y programar</button>
+<button type="submit">Aprobar y programar${varios ? ' todos los idiomas' : ''}</button>
 <p class="meta">Al confirmar se programa el envío real a ${e(d.destino)}. Este enlace solo se puede usar una vez.</p>
 </form>
-<p><img src="${e(d.captura_url)}" alt="Vista previa de la newsletter"></p>`);
+${d.versiones.map((v) => `${varios ? `<h2 style="font-size:16px;margin:24px 0 8px">${e(IDIOMAS[v.idioma] ?? v.idioma)}</h2>` : ''}<p><img src="${e(v.captura_url)}" alt="Vista previa ${e(v.idioma)}"></p>`).join('')}`);
 }
 
 export function paginaCambios(t: string, dosPropuestas: boolean) {
