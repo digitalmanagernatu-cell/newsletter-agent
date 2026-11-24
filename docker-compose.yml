@@ -1,0 +1,17 @@
+# Agentes NATU. Cada agente escucha solo en 127.0.0.1; el proxy de Plesk publica el subdominio con HTTPS.
+services:
+  newsletter:
+    build:
+      context: .
+      dockerfile: agents/newsletter/Dockerfile
+    image: natu/agent-newsletter:latest
+    container_name: natu-agent-newsletter
+    env_file: .env
+    ports:
+      - "127.0.0.1:3002:3002"
+    restart: unless-stopped
+    mem_limit: 1536m
+    shm_size: 512m
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }

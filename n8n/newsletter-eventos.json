@@ -1,0 +1,85 @@
+{
+  "name": "Newsletter – Eventos del agente",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "natu-newsletter-eventos",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "e6f68c32-172b-47a0-b132-47524d1fc81e",
+      "name": "Evento del agente",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "3a5e031d-d669-45d5-9ece-494635674ea7"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Construye el email para cada evento que avisa el agente de newsletters.\n// ── Configuración ──\nconst EQUIPO = ['digitalmanager@natuaromatic.com'];   // quién recibe los emails de aprobación (cualquiera puede aprobar)\nconst AVISOS_ERROR = ['digitalmanager@natuaromatic.com'];\n// ───────────────────\nconst ev = $input.first().json.body ?? $input.first().json;\nconst e = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');\nconst destinatarios = (...listas) => [...new Set(listas.flat().filter(Boolean).map((x) => x.toLowerCase()))].join(',');\nconst boton = (url, texto, fondo = '#000') => `<a href=\"${e(url)}\" style=\"display:inline-block;background:${fondo};color:#fff;text-decoration:none;font-weight:bold;letter-spacing:1px;padding:14px 22px;margin:6px 6px 6px 0;font-family:Arial,sans-serif;font-size:14px;text-transform:uppercase\">${e(texto)}</a>`;\nconst marco = (contenido) => `<div style=\"font-family:Arial,Helvetica,sans-serif;color:#1e1e1e;max-width:640px;margin:0 auto;font-size:15px;line-height:1.5\">${contenido}<p style=\"color:#888;font-size:12px;margin-top:32px\">Agente de newsletters · NATU Laboratories</p></div>`;\n\nif (ev.tipo === 'borradores_listos') {\n  const varias = (ev.propuestas ?? []).length > 1;\n  const bloques = (ev.propuestas ?? []).map((p) => `\n    <div style=\"border:1px solid #ddd;padding:16px;margin:16px 0\">\n      <p style=\"margin:0 0 4px;font-size:12px;letter-spacing:2px;color:#888;text-transform:uppercase\">${varias ? `Propuesta ${e(p.etiqueta)} · ` : ''}${e(p.enfoque)}</p>\n      <p style=\"margin:0\"><strong>${e(p.asunto)}</strong><br><span style=\"color:#666\">${e(p.preheader)}</span></p>\n      <p>${boton(p.enlace_aprobar, varias ? `Aprobar ${p.etiqueta} y programar` : 'Aprobar y programar')}</p>\n      <a href=\"${e(p.enlace_aprobar)}\"><img src=\"${e(p.captura_url)}\" alt=\"Vista previa\" width=\"560\" style=\"max-width:100%;border:1px solid #eee\"></a>\n    </div>`).join('');\n  const avisos = (ev.no_entregables ?? []).length ? `<p style=\"color:#9b1c1c\">⚠️ La prueba no llegará a: ${ev.no_entregables.map((n) => `${e(n.email)} (${e(n.motivo)})`).join(', ')}</p>` : '';\n  return [{ json: {\n    para: destinatarios(EQUIPO, ev.solicitante),\n    asunto: `[Aprobación] ${ev.ronda > 1 ? `Ronda ${ev.ronda} · ` : ''}${(ev.propuestas?.[0]?.asunto) ?? 'Newsletter BetrésON'}`,\n    html: marco(`<h2 style=\"margin:0 0 8px\">Newsletter lista para revisar</h2>\n      <p>${e(ev.objetivo)}</p>\n      <p>Envío previsto: <strong>${e(ev.fecha_envio ?? 'sin fecha')}</strong> · Destino: Farmacias Activas</p>\n      <p>Se ha enviado la prueba a: ${e((ev.destinatarios ?? []).join(', ') || 'nadie')}</p>${avisos}\n      ${bloques}\n      <p>${boton(ev.enlace_cambios, 'Pedir cambios', '#6b6b6b')}</p>\n      <p style=\"color:#888;font-size:13px\">Cualquier persona del equipo puede aprobar. Al pulsar se abre una página para confirmar con tu email; los enlaces caducan en 72 horas y solo sirven una vez.</p>`),\n  } }];\n}\nif (ev.tipo === 'programada') {\n  return [{ json: {\n    para: destinatarios(EQUIPO, ev.solicitante, ev.aprobador),\n    asunto: `✅ Newsletter programada: ${ev.fecha}`,\n    html: marco(`<h2>Newsletter programada</h2><p>${e(ev.objetivo)}</p>\n      <p>Se enviará a <strong>${e(ev.destino)}</strong> el <strong>${e(ev.fecha)}</strong>.</p>\n      <p>Aprobada por ${e(ev.aprobador)} (propuesta ${e(ev.enfoque)}).</p>\n      <p>${boton(ev.url_campana, 'Ver la campaña en Mailrelay')}</p>`),\n  } }];\n}\nif (ev.tipo === 'error') {\n  return [{ json: {\n    para: destinatarios(AVISOS_ERROR, ev.solicitante),\n    asunto: '⚠️ No se ha podido preparar la newsletter',\n    html: marco(`<h2>No se ha podido preparar la newsletter</h2><p>${e(ev.objetivo)}</p><p><strong>Motivo:</strong> ${e(ev.mensaje)}</p><p>Revisa la petición o avisa a Digital.</p>`),\n  } }];\n}\nif (ev.tipo === 'cancelada') {\n  return [{ json: { para: destinatarios(EQUIPO), asunto: 'Envío de newsletter cancelado', html: marco(`<p>${e(ev.actor)} ha cancelado el envío programado.${ev.motivo ? ` Motivo: ${e(ev.motivo)}` : ''}</p>`) } }];\n}\nreturn []; // otros eventos (p. ej. \"enviada\") no generan email\n"
+      },
+      "id": "89ac3951-198a-4f9b-b40a-0090d0e26ff4",
+      "name": "Construir email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "agente-newsletters@natuaromatic.com",
+        "toEmail": "={{ $json.para }}",
+        "subject": "={{ $json.asunto }}",
+        "emailFormat": "html",
+        "html": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "cc3327af-0190-4357-ad3a-c2b4a1b1dd9b",
+      "name": "Enviar email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Evento del agente": {
+      "main": [
+        [
+          {
+            "node": "Construir email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir email": {
+      "main": [
+        [
+          {
+            "node": "Enviar email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid"
+  },
+  "pinData": {}
+}

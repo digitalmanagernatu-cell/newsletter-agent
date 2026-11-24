@@ -2,7 +2,9 @@ import express, { type Request, type Response, type NextFunction } from 'express
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { claveValida } from '@natu/shared';
+import { claveValida, ErrorAprobacion, verAprobacion, q } from '@natu/shared';
+import * as apr from './aprobacion.js';
+import { paginaAprobar, paginaCambios, paginaResultado, escaparHtml as h } from './paginas.js';
 import { PeticionSchema } from './schema.js';
 import * as svc from './servicio.js';
 
@@ -15,7 +17,7 @@ import * as svc from './servicio.js';
 const DESCRIPCION_TAREA = 'Tarda 2–4 minutos: devuelve tarea_id y peticion_id; consulta el resultado con estado_campana.';
 
 function crearServidorMcp() {
-  const s = new McpServer({ name: 'natu-agente-newsletter', version: '0.2.0' });
+  const s = new McpServer({ name: 'natu-agente-newsletter', version: '0.3.0' });
   const json = (o: unknown) => ({ content: [{ type: 'text' as const, text: JSON.stringify(o, null, 2) }] });
   const seguro = <A,>(fn: (a: A) => Promise<unknown>) => async (a: A) => {
     try { return json(await fn(a)); } catch (e) { return { ...json({ error: e instanceof Error ? e.message : String(e) }), isError: true }; }
@@ -49,7 +51,23 @@ function crearServidorMcp() {
     annotations: { readOnlyHint: true },
   }, seguro((a) => svc.estado(a)));
 
-  // programar_campana se añade en la fase 3, con token de aprobación obligatorio.
+  s.registerTool('programar_campana', {
+    title: 'Programar campaña',
+    description: 'Programa el envío real de la propuesta aprobada. Exige el token de aprobación de un solo uso que recibe una persona del equipo en el email de aprobación, y el email de esa persona. Sin token válido no hace nada.',
+    inputSchema: {
+      token: z.string().min(20).describe('Token de aprobación (parámetro t del enlace "Aprobar")'),
+      aprobador_email: z.string().email(),
+      fecha_envio: z.string().optional().describe('Hora de Madrid, p. ej. 2026-12-01T09:30. Si falta, la de la petición.'),
+    },
+    annotations: { destructiveHint: true },
+  }, seguro((a) => apr.aprobarYProgramar(a.token, a.aprobador_email, a.fecha_envio)));
+
+  s.registerTool('cancelar_programacion', {
+    title: 'Cancelar programación',
+    description: 'Cancela el envío programado de una petición. Es definitivo en Mailrelay.',
+    inputSchema: { peticion_id: z.string().uuid(), actor: z.string().email(), motivo: z.string().optional() },
+    annotations: { destructiveHint: true },
+  }, seguro((a) => apr.cancelarProgramacion(a.peticion_id, a.actor, a.motivo)));
   return s;
 }
 
@@ -58,6 +76,43 @@ export function crearApp() {
   app.use(express.json({ limit: '2mb' }));
 
   app.get('/health', (_req, res) => { res.json({ ok: true, agente: 'newsletter' }); });
+
+  // ── Rutas públicas protegidas por token de un solo uso (enlaces del email) ──
+  app.use(['/aprobar', '/cambios'], express.urlencoded({ extended: false, limit: '20kb' }));
+  const html = (res: Response, codigo: number, cuerpo: string) => { res.status(codigo).set('Cache-Control', 'no-store').type('html').send(cuerpo); };
+  const fallo = (res: Response, err: unknown) => {
+    const esperado = err instanceof ErrorAprobacion;
+    if (!esperado) console.error(err);
+    html(res, esperado ? 400 : 500, paginaResultado('No se ha podido completar', h(esperado ? err.message : 'Error inesperado. Avisa a Digital.'), false));
+  };
+  // GET solo muestra la página: así los antivirus que abren enlaces no aprueban nada.
+  app.get('/aprobar', async (req, res) => {
+    try { html(res, 200, paginaAprobar(String(req.query.t ?? ''), await apr.datosAprobacion(String(req.query.t ?? '')))); } catch (err) { fallo(res, err); }
+  });
+  app.post('/aprobar', async (req, res) => {
+    try {
+      const r = await apr.aprobarYProgramar(String(req.body.t ?? ''), String(req.body.email ?? ''), String(req.body.fecha ?? '') || undefined);
+      html(res, 200, paginaResultado('Newsletter programada', `<p>Se enviará el <strong>${h(r.fecha)}</strong>.</p><p>Aprobada por ${h(r.aprobador)}. Recibiréis la confirmación por email.</p><p><a href="${h(r.url_campana)}">Ver la campaña en Mailrelay</a></p>`));
+    } catch (err) { fallo(res, err); }
+  });
+  app.get('/cambios', async (req, res) => {
+    try {
+      const a = await verAprobacion(String(req.query.t ?? ''), 'pedir_cambios');
+      const [{ n }] = await q<{ n: number }>("SELECT count(DISTINCT enfoque)::int AS n FROM newsletter.versiones WHERE peticion_id = $1", [a.recurso.replace('newsletter.peticion:', '')]);
+      html(res, 200, paginaCambios(String(req.query.t), n > 1));
+    } catch (err) { fallo(res, err); }
+  });
+  app.post('/cambios', async (req, res) => {
+    try {
+      const enfoque = ['editorial', 'comercial'].includes(req.body.enfoque) ? req.body.enfoque : undefined;
+      await apr.pedirCambios(String(req.body.t ?? ''), String(req.body.email ?? ''), String(req.body.feedback ?? ''), enfoque);
+      html(res, 200, paginaResultado('Cambios recibidos', '<p>Estamos preparando la nueva versión. Te llegará una prueba nueva y otro email de aprobación en unos minutos.</p>'));
+    } catch (err) { fallo(res, err); }
+  });
+  app.post('/callbacks/mailrelay/:firma/:peticion', async (req, res) => {
+    try { res.json(await apr.callbackMailrelay(String(req.params.firma), String(req.params.peticion), req.body ?? {})); }
+    catch { res.status(403).json({ error: 'No autorizado' }); }
+  });
 
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (!claveValida(req.headers.authorization)) { res.status(401).json({ error: 'No autorizado' }); return; }
@@ -86,6 +141,7 @@ export function crearApp() {
   app.post('/v1/newsletters/:id/prueba', ruta((r) => svc.enviarPrueba(String(r.params.id), String(r.body?.emails ?? ''), r.body?.actor)));
   app.get('/v1/newsletters/:id', ruta((r) => svc.estado({ peticion_id: String(r.params.id) })));
   app.get('/v1/tareas/:id', ruta((r) => svc.estado({ tarea_id: String(r.params.id) })));
+  app.post('/v1/newsletters/:id/cancelar', ruta((r) => apr.cancelarProgramacion(String(r.params.id), String(r.body?.actor ?? ''), r.body?.motivo)));
   return app;
 }
 

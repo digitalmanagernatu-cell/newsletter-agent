@@ -1,4 +1,4 @@
-import { q, crearTarea, actualizarTarea, leerTarea, registrarEvento, registrarCoste } from '@natu/shared';
+import { q, crearTarea, actualizarTarea, leerTarea, registrarEvento, registrarCoste, emitirAprobacion, revocarAprobaciones, notificar, madridAUtc, formatoMadrid } from '@natu/shared';
 import { PeticionSchema, type Peticion, type Composicion } from './schema.js';
 import { crearNewsletter, type Propuesta } from './pipeline.js';
 import { Mailrelay } from './plataformas/mailrelay.js';
@@ -33,9 +33,17 @@ async function alojarImagenes(p: Peticion, carpetaId: number): Promise<Peticion>
     cache.set(url, publica);
     return publica;
   };
+  const subidas = [];
+  for (const a of p.adjuntos) {
+    const datos = Buffer.from(a.contenido_base64, 'base64');
+    if (datos.length > 10 * 1024 * 1024) throw new Error(`La imagen ${a.nombre} supera 10 MB`);
+    const { url } = await mailrelay().subirImagen(a.nombre.replace(/[^\w.\-]+/g, '_'), datos, carpetaId);
+    subidas.push({ url, descripcion: a.descripcion ?? a.nombre });
+  }
   return {
     ...p,
-    imagenes: await Promise.all(p.imagenes.map(async (i) => ({ ...i, url: (await alojar(i.url))! }))),
+    adjuntos: [],
+    imagenes: [...subidas, ...(await Promise.all(p.imagenes.map(async (i) => ({ ...i, url: (await alojar(i.url))! }))))],
     productos: await Promise.all(p.productos.map(async (pr) => ({ ...pr, imagen: await alojar(pr.imagen) }))),
   };
 }
@@ -82,7 +90,7 @@ async function procesar(tareaId: string, peticionId: string, p: Peticion, numero
     const { entregables, no_entregables } = await comprobarEntregables(filtrados.validos);
     const destinatarios = { validos: entregables, rechazados: filtrados.rechazados, no_entregables };
     if (no_entregables.length) l(`no llegará a: ${no_entregables.map((n) => `${n.email} (${n.motivo})`).join(', ')}`);
-    const resultado = [];
+    const resultado: any[] = [];
     for (const pr of propuestas) {
       const captura = await mailrelay().subirImagen(`captura-${peticionId.slice(0, 8)}-v${numero}-${pr.enfoque}.png`, pr.capturas.escritorio, carpetaMedios);
       const versionId = await guardarVersion(peticionId, numero, pr, p.feedback, captura.url);
@@ -124,15 +132,37 @@ async function procesar(tareaId: string, peticionId: string, p: Peticion, numero
     }
     const estado = destinatarios.validos.length ? 'prueba_enviada' : 'borrador';
     await q('UPDATE newsletter.peticiones SET estado = $2, actualizado = now() WHERE id = $1', [peticionId, estado]);
-    const salida = { peticion_id: peticionId, ronda: numero, estado, propuestas: resultado, pruebas: destinatarios };
+
+    // Enlaces de aprobación: uno por propuesta y uno para pedir cambios. Los anteriores dejan de valer.
+    await revocarAprobaciones(recurso(peticionId));
+    const base = (process.env.PUBLIC_URL ?? 'http://localhost:3002').replace(/\/$/, '');
+    for (const r of resultado) {
+      const { token } = await emitirAprobacion({
+        agente: AGENTE, accion: 'programar_campana', recurso: recurso(peticionId),
+        parametros: { version_id: r.version_id, enfoque: r.enfoque, ronda: numero, campana_mailrelay: r.campana_mailrelay, fecha_envio: p.fecha_envio ?? null },
+      });
+      Object.assign(r, { enlace_aprobar: `${base}/aprobar?t=${token}` });
+    }
+    const cambios = await emitirAprobacion({ agente: AGENTE, accion: 'pedir_cambios', recurso: recurso(peticionId), parametros: { ronda: numero } });
+    const enlaceCambios = `${base}/cambios?t=${cambios.token}`;
+
+    const salida = { peticion_id: peticionId, ronda: numero, estado, propuestas: resultado, pruebas: destinatarios, enlace_cambios: enlaceCambios };
     await actualizarTarea(tareaId, { estado: 'completada', salida });
     await registrarEvento({ agente: AGENTE, tareaId, recurso: recurso(peticionId), tipo: numero === 1 ? 'borradores_creados' : 'borradores_regenerados', datos: salida });
+    await notificar({
+      tipo: 'borradores_listos', marca: p.marca, peticion_id: peticionId, ronda: numero, solicitante: p.solicitante_email ?? null,
+      destinatarios: destinatarios.validos, no_entregables: destinatarios.no_entregables,
+      objetivo: p.objetivo, fecha_envio: p.fecha_envio ? formatoMadrid(madridAUtc(p.fecha_envio)) : null,
+      propuestas: resultado.map((r: any) => ({ etiqueta: r.propuesta, enfoque: r.enfoque, asunto: r.asunto, preheader: r.preheader, captura_url: r.captura_url, enlace_aprobar: r.enlace_aprobar, url_panel: r.url_panel })),
+      enlace_cambios: enlaceCambios,
+    });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     l(`ERROR ${msg}`);
     await actualizarTarea(tareaId, { estado: 'error', error: msg }).catch(() => {});
     await q('UPDATE newsletter.peticiones SET estado = $2, actualizado = now() WHERE id = $1', [peticionId, 'error']).catch(() => {});
     await registrarEvento({ agente: AGENTE, tareaId, recurso: recurso(peticionId), tipo: 'error', datos: { mensaje: msg } }).catch(() => {});
+    await notificar({ tipo: 'error', peticion_id: peticionId, solicitante: p.solicitante_email ?? null, objetivo: p.objetivo, mensaje: msg }).catch(() => {});
   }
 }
 

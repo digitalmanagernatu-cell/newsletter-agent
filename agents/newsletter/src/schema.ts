@@ -18,6 +18,8 @@ export const PeticionSchema = z.object({
   textos_clave: z.array(z.string()).default([]),
   productos: z.array(ProductoSchema).default([]),
   imagenes: z.array(z.object({ url: z.string().url(), descripcion: z.string().optional() })).default([]),
+  /** Imágenes subidas en el formulario de n8n (base64). Se suben a la plataforma y pasan a `imagenes`. */
+  adjuntos: z.array(z.object({ nombre: z.string(), contenido_base64: z.string().max(14_000_000), descripcion: z.string().optional() })).default([]),
   idioma: z.enum(['es', 'it', 'fr', 'ro', 'en']).default('es'),
   propuestas: z.union([z.literal(1), z.literal(2)]).default(1),
   solicitante_email: z.string().email().optional(),

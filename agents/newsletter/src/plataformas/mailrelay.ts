@@ -1,10 +1,15 @@
 /**
  * Cliente de la API v1 de Mailrelay (https://apidocs.mailrelay.com/openapi.json).
  *
- * SEGURIDAD: este cliente NO expone `POST /campaigns/{id}/send_all`. Esa llamada
- * sin `scheduled_at` envía al instante a toda la lista. Programar se añadirá en
- * la fase 3, exigiendo un token de aprobación válido y una fecha futura.
+ * SEGURIDAD: `POST /campaigns/{id}/send_all` sin `scheduled_at` envía al instante
+ * a toda la lista. Por eso el único método que lo usa (`programar`) exige siempre
+ * una fecha futura con margen y una prueba de aprobación consumida, y nunca
+ * llama a send_all sin `scheduled_at`.
  */
+export const MARGEN_MINIMO_MIN = 10;
+
+/** Marca que solo puede fabricar la capa de servicio tras consumir un token de aprobación. */
+export interface AprobacionConsumida { readonly aprobacionId: string; readonly aprobadoPor: string }
 export interface Campana {
   id: number;
   subject: string;
@@ -120,6 +125,33 @@ export class Mailrelay {
     if (s.status && s.status !== 'active') return `estado "${s.status}" en Mailrelay`;
     return null;
   }
+
+  /**
+   * Programa el envío a los grupos en `fecha` (instante UTC). Devuelve el id del envío
+   * (sent_campaign), necesario para cancelarlo.
+   */
+  async programar(id: number, opts: { grupos: number[]; fecha: Date; aprobacion: AprobacionConsumida; callbackUrl?: string }): Promise<{ envioId: number; programadaUtc: string }> {
+    if (!opts.aprobacion?.aprobacionId || !opts.aprobacion?.aprobadoPor) throw new Error('Programar exige una aprobación consumida');
+    if (!(opts.fecha instanceof Date) || Number.isNaN(opts.fecha.getTime())) throw new Error('Programar exige una fecha válida');
+    if (opts.fecha.getTime() < Date.now() + MARGEN_MINIMO_MIN * 60_000)
+      throw new Error(`La fecha de envío debe ser al menos ${MARGEN_MINIMO_MIN} minutos en el futuro`);
+    if (!opts.grupos.length) throw new Error('Sin grupos de destino');
+    const programadaUtc = opts.fecha.toISOString().slice(0, 19).replace('T', ' '); // "YYYY-MM-DD HH:MM:SS" en UTC
+    const r = await this.pedir<{ id: number; scheduled_at?: string; status?: string }>('POST', `/campaigns/${id}/send_all`, {
+      target: 'groups',
+      group_ids: opts.grupos,
+      scheduled_at: programadaUtc,
+      callback_url: opts.callbackUrl,
+    });
+    return { envioId: r.id, programadaUtc };
+  }
+
+  /** Cancela un envío programado (definitivo: no se puede reanudar). */
+  async cancelarEnvio(envioId: number): Promise<void> {
+    await this.pedir('PATCH', `/sent_campaigns/${envioId}/cancel`);
+  }
+
+  leerEnvio = (envioId: number) => this.pedir<{ id: number; status: string; scheduled_at?: string }>('GET', `/sent_campaigns/${envioId}`);
 
   urlPanel = (id: number) => `https://${this.cuenta}/admin/campaigns/${id}/edit`;
 }

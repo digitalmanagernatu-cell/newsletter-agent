@@ -1,0 +1,242 @@
+{
+  "name": "Newsletter BetrésON – Petición",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Nueva newsletter BetrésON",
+        "formDescription": "El agente diseña la newsletter, crea el borrador en Mailrelay y te manda una prueba. Después recibiréis un email para aprobarla o pedir cambios.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Tipo de campaña",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Lanzamiento"
+                  },
+                  {
+                    "option": "Promoción"
+                  },
+                  {
+                    "option": "Estacional"
+                  },
+                  {
+                    "option": "Informativa"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Objetivo",
+              "fieldType": "textarea",
+              "placeholder": "¿Qué queremos conseguir con esta newsletter?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Asunto sugerido",
+              "placeholder": "Opcional"
+            },
+            {
+              "fieldLabel": "Mensaje y textos clave",
+              "fieldType": "textarea",
+              "placeholder": "Mensaje principal, condiciones, fechas, precios… Todo lo que deba aparecer.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Productos",
+              "fieldType": "textarea",
+              "placeholder": "Uno por línea: Nombre | Descripción | URL del producto | URL de la imagen"
+            },
+            {
+              "fieldLabel": "Imágenes",
+              "fieldType": "file",
+              "multipleFiles": true,
+              "acceptFileTypes": ".jpg,.jpeg,.png,.gif,.webp"
+            },
+            {
+              "fieldLabel": "URLs de imágenes",
+              "fieldType": "textarea",
+              "placeholder": "Opcional. Una URL pública por línea (enlaces directos a la imagen)"
+            },
+            {
+              "fieldLabel": "Fecha de envío",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Hora de envío",
+              "placeholder": "09:30 (hora de Madrid)",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Propuestas",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1 propuesta"
+                  },
+                  {
+                    "option": "2 propuestas (editorial y comercial)"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tu email",
+              "fieldType": "email",
+              "placeholder": "nombre@natuaromatic.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Enviar la prueba también a",
+              "placeholder": "Opcional. Emails de la empresa separados por comas"
+            }
+          ]
+        },
+        "options": {
+          "buttonLabel": "Crear newsletter",
+          "appendAttribution": false,
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "¡Recibido! En unos minutos te llegará la prueba y el email de aprobación."
+            }
+          }
+        }
+      },
+      "id": "fbbd735c-387b-4d3d-a590-67f9fd8d5d0f",
+      "name": "Formulario de newsletter",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "17168119-c0da-4f3c-a45c-6bfbf22b23e5"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Convierte las respuestas del formulario en la petición que espera el agente.\nconst f = $input.first().json;\nconst campo = (etiqueta) => (f[etiqueta] ?? '').toString().trim();\n\nconst tipos = { 'Lanzamiento': 'lanzamiento', 'Promoción': 'promo', 'Estacional': 'estacional', 'Informativa': 'informativa' };\nconst lineas = (t) => t.split(/\\r?\\n/).map((l) => l.trim()).filter(Boolean);\n\n// Productos: una línea por producto → Nombre | Descripción | URL del producto | URL de la imagen\nconst productos = lineas(campo('Productos')).map((l) => {\n  const [nombre, descripcion, url, imagen] = l.split('|').map((x) => (x ?? '').trim());\n  const p = { nombre };\n  if (descripcion) p.descripcion = descripcion;\n  if (/^https?:\\/\\//.test(url ?? '')) p.url = url;\n  if (/^https?:\\/\\//.test(imagen ?? '')) p.imagen = imagen;\n  return p;\n}).filter((p) => p.nombre);\n\nconst imagenes = lineas(campo('URLs de imágenes')).filter((u) => /^https?:\\/\\//.test(u)).map((url) => ({ url }));\n\n// Imágenes subidas en el formulario → base64 (el agente las sube a Mailrelay).\nconst adjuntos = [];\nconst binarios = $input.first().binary ?? {};\nfor (const clave of Object.keys(binarios)) {\n  const buffer = await this.helpers.getBinaryDataBuffer(0, clave);\n  adjuntos.push({ nombre: binarios[clave].fileName ?? `${clave}.jpg`, contenido_base64: buffer.toString('base64') });\n}\n\nconst mensaje = campo('Mensaje y textos clave');\nconst fecha = campo('Fecha de envío').slice(0, 10);\nconst hora = (campo('Hora de envío').match(/^(\\d{1,2})[:.](\\d{2})/) ?? [null, '09', '00']).slice(1).map((x) => x.padStart(2, '0')).join(':');\n\nreturn [{ json: {\n  marca: 'betreson',\n  tipo_campana: tipos[campo('Tipo de campaña')] ?? 'informativa',\n  objetivo: campo('Objetivo'),\n  asunto_sugerido: campo('Asunto sugerido') || undefined,\n  mensaje,\n  textos_clave: [],\n  productos,\n  imagenes,\n  adjuntos,\n  idioma: 'es',\n  propuestas: campo('Propuestas').startsWith('2') ? 2 : 1,\n  solicitante_email: campo('Tu email').toLowerCase(),\n  destinatarios_prueba: campo('Enviar la prueba también a') || undefined,\n  fecha_envio: `${fecha}T${hora}`,\n} }];"
+      },
+      "id": "2c39c2e7-c54d-4725-9d92-9f1f7323c55a",
+      "name": "Preparar petición",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://news.agentes.natulaboratories.es/v1/newsletters",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "2fb2c4b5-24c6-47f1-8395-68cde940925a",
+      "name": "Enviar al agente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const f = $('Formulario de newsletter').first().json;\nconst err = $input.first().json.error ?? $input.first().json;\nreturn [{ json: {\n  para: (f['Tu email'] ?? '').toString(),\n  asunto: 'No se ha podido iniciar tu newsletter',\n  html: `<p>El agente de newsletters no ha aceptado la petición.</p><pre style=\"white-space:pre-wrap\">${JSON.stringify(err, null, 2).replace(/</g, '&lt;')}</pre><p>Revisa los datos del formulario o avisa a Digital.</p>`,\n} }];"
+      },
+      "id": "e6fd3a17-0a97-4b07-9a4f-9b153708a823",
+      "name": "Email de error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "agente-newsletters@natuaromatic.com",
+        "toEmail": "={{ $json.para }}",
+        "subject": "={{ $json.asunto }}",
+        "emailFormat": "html",
+        "html": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "499ffef4-c56c-4248-9726-78766320f927",
+      "name": "Avisar del error",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        120
+      ]
+    }
+  ],
+  "connections": {
+    "Formulario de newsletter": {
+      "main": [
+        [
+          {
+            "node": "Preparar petición",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar petición": {
+      "main": [
+        [
+          {
+            "node": "Enviar al agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar al agente": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Email de error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email de error": {
+      "main": [
+        [
+          {
+            "node": "Avisar del error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid"
+  },
+  "pinData": {}
+}
