@@ -44,7 +44,7 @@ curl -s https://news.agentes.natulaboratories.es/health
 2. Credenciales:
    - **Header Auth "Agente newsletter"**: nombre `Authorization`, valor `Bearer <AGENT_API_KEYS>` → nodo *Enviar al agente*.
    - **Header Auth "Eventos agente"**: nombre `X-Natu-Clave`, valor `<N8N_EVENTS_KEY>` → nodo *Evento del agente*.
-   - **SMTP** (o cambiar los nodos de email por Outlook/Gmail) → nodos *Enviar email* y *Avisar del error*. Ajustar el remitente.
+   - **Email**: el SMTP de Microsoft 365 no funciona (Microsoft lo está retirando). Sustituir los nodos *Enviar email* y *Avisar del error* por **Microsoft Outlook → Send a message** con credencial OAuth ("Connect my account"), con To `{{ $json.para }}`, Subject `{{ $json.asunto }}`, Message `{{ $json.html }}` y tipo de contenido **HTML**.
 3. En *Construir email*, revisar la lista `EQUIPO` (quién recibe los emails de aprobación).
 4. Activar los dos flujos. La URL de producción del webhook es la que va en `N8N_EVENTS_URL`.
 
@@ -63,3 +63,9 @@ docker logs --tail 100 natu-agent-newsletter
 ## Prueba de programación realizada (24/11/2026)
 
 En Mailrelay existe el grupo **"Prueba agente"** (id 12) con una sola dirección (digitalmanager@natuaromatic.com). Se creó el borrador 85 solo para ese grupo, se programó a 3 días (`pending` a la hora UTC esperada) y se canceló (`cancelled`). El grupo puede reutilizarse para pruebas.
+
+## Estado en producción (24/11/2026)
+
+- Agente desplegado en `https://news.agentes.natulaboratories.es` (contenedor `natu-agent-newsletter`).
+- Formulario del equipo: https://natulab.app.n8n.cloud/form/9fa52642-3a57-412d-82da-3bdcb96aaf70 (n8n cambia la ruta al importar).
+- Prueba completa: formulario → borrador 86 en Mailrelay → prueba → email de aprobación (Outlook) → "Pedir cambios" → ronda 2 con el mismo borrador actualizado.
