@@ -96,6 +96,10 @@ Campos de fusión útiles: `MMERGE5` TIPO CLIENTE, `MMERGE6`/`MMERGE10` grupo cl
 
 ## 4. Decisiones
 
+- **BetrésON** se envía solo al grupo **Farmacias Activas** (id 6).
+- **NATU**: audiencia NATU (`269aad017f`). Un segmento por idioma: Natu ES, Natu IT, Natu FR, Natu RO y Natu EN (este último lo creará Irene). Si la petición indica "toda la base de datos", se envía a toda la audiencia NATU.
+- **Destinatarios de prueba**: campo libre en el formulario, en el que quien hace la petición escribe a quién enviarla.
+
 - n8n: el de la nube.
 - Repositorio: `newsletter-agent`, con estructura de monorepo para renombrarlo después a `natu-agentes`.
 - Postgres: proyecto Neon propio para el agente, con suspensión automática para no agotar la cuota.

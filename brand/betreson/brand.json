@@ -1,0 +1,28 @@
+{
+  "marca": "BetrésON",
+  "plataforma": "mailrelay",
+  "idiomas": ["es"],
+  "posicionamiento": "Marca propia de NATU para farmacia. Siempre se comunica como venta exclusiva en farmacia.",
+  "universos": ["Perfumería", "Personal Care", "Ambientación", "Pets"],
+  "palabras_prohibidas": { "higiene corporal": "Personal Care" },
+  "logo": {
+    "cuadrado": "assets/logo-cuadrado.png",
+    "horizontal": "assets/logo-horizontal-negro.png",
+    "notas": "Cuadrado: blanco sobre negro. Horizontal: negro sobre transparente.",
+    "ancho_cabecera_px": 180
+  },
+  "colores": {
+    "negro": { "hex": "#000000", "uso": "logo, texto principal, botones" },
+    "blanco": { "hex": "#FFFFFF", "uso": "fondo" },
+    "PENDIENTE": "Colores de acento y de cada universo."
+  },
+  "tipografias": {
+    "titulares": { "web": "PENDIENTE (el logo usa una sans geométrica)", "fallback": "Arial, Helvetica, sans-serif" },
+    "cuerpo": { "fallback": "Arial, Helvetica, sans-serif" }
+  },
+  "layout": { "ancho_max_px": 600, "margen_lateral_px": 24, "espaciado_bloques_px": 32 },
+  "remitente": { "mailrelay_sender_id": 1, "nombre": "Betrés ON", "email": "info@betreson.com" },
+  "destino": { "mailrelay_group_ids": [6], "nombre": "Farmacias Activas" },
+  "pie_legal": "PENDIENTE: razón social, CIF, dirección, texto RGPD. Enlace de baja de Mailrelay: PENDIENTE de verificar la etiqueta.",
+  "pendiente": ["colores de acento", "tipografía", "tono", "pie legal", "newsletters de ejemplo"]
+}
