@@ -35,8 +35,9 @@ function crearServidorMcp() {
     inputSchema: {
       peticion_id: z.string().uuid(), feedback: z.string().min(3), actor: z.string().email().optional(),
       enfoque: z.enum(['editorial', 'comercial']).optional().describe('Solo regenera esta propuesta (la que ha elegido el equipo)'),
+      imagenes: z.array(z.string().url()).max(10).optional().describe('Imágenes nuevas (URL pública directa) para usar en la nueva versión'),
     },
-  }, seguro((a) => svc.regenerar(a.peticion_id, a.feedback, a.actor, 'mcp', a.enfoque)));
+  }, seguro((a) => svc.regenerar(a.peticion_id, a.feedback, a.actor, 'mcp', a.enfoque, a.imagenes)));
 
   s.registerTool('enviar_prueba', {
     title: 'Enviar prueba',
@@ -144,7 +145,7 @@ export function crearApp() {
     }
   };
   app.post('/v1/newsletters', ruta((r) => svc.crear(r.body, 'n8n'), 202));
-  app.post('/v1/newsletters/:id/regenerar', ruta((r) => svc.regenerar(String(r.params.id), String(r.body?.feedback ?? ''), r.body?.actor, 'n8n', r.body?.enfoque), 202));
+  app.post('/v1/newsletters/:id/regenerar', ruta((r) => svc.regenerar(String(r.params.id), String(r.body?.feedback ?? ''), r.body?.actor, 'n8n', r.body?.enfoque, Array.isArray(r.body?.imagenes) ? r.body.imagenes.map(String) : []), 202));
   app.post('/v1/newsletters/:id/prueba', ruta((r) => svc.enviarPrueba(String(r.params.id), String(r.body?.emails ?? ''), r.body?.actor)));
   app.get('/v1/newsletters', ruta((r) => svc.listar({ solicitante: r.query.solicitante ? String(r.query.solicitante) : undefined, limite: r.query.limite ? Number(r.query.limite) : undefined })));
   app.get('/v1/newsletters/:id', ruta((r) => svc.estado({ peticion_id: String(r.params.id) })));

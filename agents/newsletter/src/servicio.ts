@@ -169,7 +169,7 @@ export async function crear(entrada: unknown, origen = 'http') {
   return { tarea_id: tareaId, peticion_id: r.id, estado: 'en_curso' };
 }
 
-export async function regenerar(peticionId: string, feedback: string, actor?: string, origen = 'http', enfoque?: 'editorial' | 'comercial') {
+export async function regenerar(peticionId: string, feedback: string, actor?: string, origen = 'http', enfoque?: 'editorial' | 'comercial', imagenesNuevas: string[] = []) {
   const [pet] = await q<{ peticion: Peticion; estado: string }>('SELECT peticion, estado FROM newsletter.peticiones WHERE id = $1', [peticionId]);
   if (!pet) throw new Error('Petición no encontrada');
   if (['programada', 'enviada', 'cancelada'].includes(pet.estado)) throw new Error(`No se puede regenerar una newsletter ${pet.estado}`);
@@ -178,8 +178,10 @@ export async function regenerar(peticionId: string, feedback: string, actor?: st
     `SELECT DISTINCT ON (enfoque) enfoque, composicion FROM newsletter.versiones WHERE peticion_id = $1 AND numero = $2 ORDER BY enfoque, (idioma = 'es') DESC`, [peticionId, max],
   );
   if (enfoque && !maestras.some((u) => u.enfoque === enfoque)) throw new Error(`No hay propuesta ${enfoque} en esta petición`);
-  const p: Peticion = { ...PeticionSchema.parse(pet.peticion), feedback };
-  const tareaId = await crearTarea({ agente: AGENTE, tipo: 'regenerar', entrada: { peticion_id: peticionId, feedback, enfoque }, solicitante: actor, origen });
+  const base = PeticionSchema.parse(pet.peticion);
+  const nuevas = imagenesNuevas.filter((u) => /^https:\/\//.test(u)).map((url) => ({ url, descripcion: 'Imagen añadida al pedir cambios' }));
+  const p: Peticion = { ...base, imagenes: [...base.imagenes, ...nuevas], feedback };
+  const tareaId = await crearTarea({ agente: AGENTE, tipo: 'regenerar', entrada: { peticion_id: peticionId, feedback, enfoque, imagenes: imagenesNuevas }, solicitante: actor, origen });
   await q("UPDATE newsletter.peticiones SET estado = 'cambios_pedidos', tarea_id = $2, peticion = $3, actualizado = now() WHERE id = $1", [peticionId, tareaId, JSON.stringify(p)]);
   await registrarEvento({ agente: AGENTE, tareaId, recurso: recurso(peticionId), tipo: 'cambios_pedidos', actor, datos: { feedback, enfoque } });
   const elegidas = enfoque ? [enfoque] : maestras.map((u) => u.enfoque);
