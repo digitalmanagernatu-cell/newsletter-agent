@@ -107,7 +107,7 @@ export async function crearNewsletter(p: Peticion, opts: { salida?: string; log?
   const log = opts.log ?? (() => {});
   const kit = cargarKit(p.marca);
   const usos: Uso[] = [];
-  const enfoques: ('editorial' | 'comercial')[] = opts.enfoques?.length ? opts.enfoques : p.propuestas === 2 ? ['editorial', 'comercial'] : [p.tipo_campana === 'informativa' ? 'editorial' : 'comercial'];
+  const enfoques: ('editorial' | 'comercial')[] = opts.enfoques?.length ? opts.enfoques : p.propuestas === 2 ? ['editorial', 'comercial'] : [['informativa', 'comunicado', 'cierre', 'felicitacion'].includes(p.tipo_campana) ? 'editorial' : 'comercial'];
   const idiomas = idiomasDe(p);
   const porEnfoque = await Promise.all(enfoques.map(async (e) => {
     const maestra = await generarPropuesta(kit, p, e, usos, log, opts.anteriores?.[e]);

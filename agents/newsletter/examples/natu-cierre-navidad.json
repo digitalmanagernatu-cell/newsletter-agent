@@ -1,0 +1,8 @@
+{
+  "marca": "natu",
+  "tipo_campana": "cierre",
+  "objetivo": "EJEMPLO DE PRUEBA (datos ficticios). Avisar del cierre por vacaciones de Navidad, del último día para hacer pedidos y felicitar las fiestas.",
+  "mensaje": "Cerramos por vacaciones del 24 de diciembre de 2026 al 6 de enero de 2027, ambos incluidos. Los pedidos recibidos hasta el 18 de diciembre a las 14:00 se enviarán antes del cierre. Los pedidos posteriores se prepararán a partir del 7 de enero. Gracias por vuestra confianza este año y felices fiestas.",
+  "idiomas": ["es", "it", "fr", "ro"],
+  "propuestas": 1
+}

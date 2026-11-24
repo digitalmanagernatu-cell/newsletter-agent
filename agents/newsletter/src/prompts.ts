@@ -37,8 +37,10 @@ Público: ${r.audiencia}
 Tono: ${r.tono}
 Colores: oscuro ${r.colores.principal_oscuro.hex} (cabecera, titulares, botones), dorado ${r.colores.dorado.hex} (acento: cifras, fechas), verde salvia ${r.colores.verde_salvia.hex} (cajas de argumentos), arena ${r.colores.arena.hex} (fichas de referencias), claro ${r.colores.principal_claro.hex}. El acento por defecto es el dorado.
 Tipografía: Montserrat (Arial de respaldo).
+Uso: ${r.uso}
+Criterio por tipo de campaña: ${Object.entries(r.tipos).map(([k, v]) => `${k}: ${v}`).join(' | ')}
 Estructura habitual de referencia: ${r.estructura_habitual.join(' → ')}.
-CTA: botón (style "button") con enlace ${r.cta.enlace} y texto "${r.cta.texto.es}" (en otros idiomas: ${Object.entries(r.cta.texto).map(([k, v]) => `${k}: "${v}"`).join(', ')}).
+CTA (solo cuando haya una acción concreta): botón (style "button") con enlace ${r.cta.enlace} y texto "${r.cta.texto.es}" (en otros idiomas: ${Object.entries(r.cta.texto).map(([k, v]) => `${k}: "${v}"`).join(', ')}).
 Referencias de producto: códigos como FF1050.1L; respétalos exactamente.`;
 }
 
@@ -51,6 +53,7 @@ ${CATALOGO_BLOQUES}
 
 Criterios de diseño:
 - Decide la estructura según tipo de campaña, número de productos, fotos disponibles y cantidad de texto. Un aviso informativo puede no llevar imagen; un lanzamiento suele abrir con hero.
+- No repitas el mismo dato (fechas, cifras) en más de dos sitios: una vez destacado y, como mucho, una vez en el resumen.
 - Ritmo: alterna bloques densos y aire. Párrafos cortos (2–3 líneas). Negritas solo en lo esencial.
 - Usa SOLO las URLs de imagen que te den. Nunca inventes imágenes, precios, fechas, porcentajes ni condiciones que no estén en la petición.
 - El email debe funcionar sin imágenes (alt descriptivos) y en móvil.

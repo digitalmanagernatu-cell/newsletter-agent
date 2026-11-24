@@ -120,12 +120,11 @@
   },
   "audiencia": "Clientes B2B de NATU Granel: tiendas y negocios que compran fragancia a granel (formato 1 litro, etc.) para revender o elaborar. Se les habla de tú (o su equivalente natural en cada idioma) como proveedor experto y cercano.",
   "estructura_habitual": [
-    "Cabecera gris oscuro con logo blanco y, a veces, la oferta principal (antetítulo en mayúsculas, cifra grande en dorado, fechas en recuadro dorado)",
-    "Saludo breve y 2 párrafos con negritas en lo esencial",
-    "Bloque de producto o referencias (fichas arena o fotos con nombre de fragancia)",
-    "Caja verde salvia con argumentos",
-    "Botón oscuro 'Hacer mi pedido' a la tienda B2B",
-    "Condiciones en letra pequeña",
+    "Cabecera gris oscuro con logo blanco",
+    "Mensaje principal: titular claro y, si hay fechas, destacadas (bloque 'offer' con las fechas o recuadro dorado)",
+    "Saludo breve y 1–2 párrafos",
+    "Si hay que actuar (pedir antes de una fecha, revisar algo): caja verde salvia con los puntos clave",
+    "Botón oscuro solo si hay una acción concreta",
     "Pie gris oscuro con razón social, ciudad, motivo y baja"
   ],
   "cta": {
@@ -168,5 +167,15 @@
     "fr": "francés",
     "ro": "rumano",
     "en": "inglés"
+  },
+  "uso": "Por Mailchimp NATU NO se lanzan productos. Se usa para comunicaciones con clientes de granel: comunicados e información, cierres y cambios de horario (vacaciones, festivos), avisos de pedidos y logística, y felicitaciones (Navidad, fin de año…).",
+  "tipos": {
+    "comunicado": "Información para clientes (cambios de condiciones, novedades de servicio, avisos). Claro y directo: qué cambia, desde cuándo y qué tiene que hacer el cliente. CTA solo si hay una acción concreta.",
+    "informativa": "Igual que comunicado.",
+    "cierre": "Cierre o cambio de horario. Lo principal, muy visible arriba: fechas de cierre (recuadro o bloque 'offer' con las fechas como protagonista), último día para pedidos y cuándo se reanudan envíos. Tono amable. CTA 'Hacer mi pedido' solo para animar a pedir antes del cierre.",
+    "felicitacion": "Felicitación (Navidad, Año Nuevo…). Corta, cálida y con aire; agradecimiento por la confianza; sin argumentos de venta ni descuentos salvo que la petición los incluya. Puede ir sin CTA. Si hay cierre por fiestas, se puede mencionar en una línea.",
+    "estacional": "Aviso ligado a una época (campaña de Navidad, verano): previsión de pedidos, plazos. Informativo.",
+    "promo": "Solo si la petición lo pide expresamente.",
+    "lanzamiento": "No se usa para NATU."
   }
 }

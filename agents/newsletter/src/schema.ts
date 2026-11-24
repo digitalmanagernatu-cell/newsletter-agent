@@ -11,7 +11,7 @@ export const ProductoSchema = z.object({
 
 export const PeticionSchema = z.object({
   marca: z.enum(['betreson', 'natu']),
-  tipo_campana: z.enum(['lanzamiento', 'promo', 'estacional', 'informativa']),
+  tipo_campana: z.enum(['lanzamiento', 'promo', 'estacional', 'informativa', 'comunicado', 'cierre', 'felicitacion']),
   objetivo: z.string().min(1),
   asunto_sugerido: z.string().optional(),
   mensaje: z.string().min(1),
