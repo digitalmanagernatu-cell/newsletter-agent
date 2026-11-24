@@ -35,16 +35,19 @@ function maquetar(kit: Kit, comp: Composicion) {
   return { mjml, html, avisos: revisarReglas(kit, comp, html, errores) };
 }
 
-function describirPeticion(p: Peticion, enfoque: string): string {
+function describirPeticion(p: Peticion, enfoque: string, anterior?: Composicion): string {
+  const previa = anterior
+    ? `\n\nVersión anterior que el equipo ha revisado (mantén lo que funciona y aplica el feedback):\n${JSON.stringify(anterior)}`
+    : '';
   return `Diseña una newsletter con enfoque ${enfoque.toUpperCase()}${enfoque === 'editorial' ? ' (más relato, aire y tono de marca)' : ' (beneficio claro, producto y condiciones al frente)'}.
 
 Petición del equipo (JSON):
-${JSON.stringify({ ...p, propuestas: undefined, solicitante_email: undefined }, null, 2)}`;
+${JSON.stringify({ ...p, propuestas: undefined, solicitante_email: undefined, destinatarios_prueba: undefined, fecha_envio: undefined }, null, 2)}${previa}`;
 }
 
-async function generarPropuesta(kit: Kit, p: Peticion, enfoque: 'editorial' | 'comercial', usos: Uso[], log: (s: string) => void): Promise<Propuesta> {
+async function generarPropuesta(kit: Kit, p: Peticion, enfoque: 'editorial' | 'comercial', usos: Uso[], log: (s: string) => void, anterior?: Composicion): Promise<Propuesta> {
   log(`[${enfoque}] componiendo…`);
-  let comp = await pedirJson({ sistema: sistemaComposicion(kit), usuario: describirPeticion(p, enfoque), esquema: ComposicionSchema, usos });
+  let comp = await pedirJson({ sistema: sistemaComposicion(kit), usuario: describirPeticion(p, enfoque, anterior), esquema: ComposicionSchema, usos });
   comp.enfoque = enfoque;
   const revisiones: Propuesta['revisiones'] = [];
 
@@ -66,19 +69,27 @@ async function generarPropuesta(kit: Kit, p: Peticion, enfoque: 'editorial' | 'c
     });
     revisiones.push(rev);
     log(`[${enfoque}] revisión: ${rev.puntuacion}/10 ${rev.aprobado ? 'aprobada' : 'con cambios'}${rev.problemas.length ? ' — ' + rev.problemas.join(' | ') : ''}`);
-    if (rev.aprobado || !rev.composicion_corregida || ronda >= MAX_CORRECCIONES) {
+    if (rev.aprobado || !rev.composicion_corregida) {
       return { enfoque, composicion: comp, ...m, revisiones, capturas: caps };
+    }
+    if (ronda >= MAX_CORRECCIONES) {
+      // Última corrección sin nueva revisión visual: se aplica solo si no introduce errores automáticos.
+      const final = { ...rev.composicion_corregida, enfoque };
+      const mf = maquetar(kit, final);
+      if (mf.avisos.some((a) => a.nivel === 'error')) return { enfoque, composicion: comp, ...m, revisiones, capturas: caps };
+      log(`[${enfoque}] aplicada la última corrección (sin nueva revisión)`);
+      return { enfoque, composicion: final, ...mf, revisiones, capturas: await capturar(mf.html) };
     }
     comp = { ...rev.composicion_corregida, enfoque };
   }
 }
 
-export async function crearNewsletter(p: Peticion, opts: { salida?: string; log?: (s: string) => void } = {}) {
+export async function crearNewsletter(p: Peticion, opts: { salida?: string; log?: (s: string) => void; anteriores?: Partial<Record<'editorial' | 'comercial', Composicion>>; enfoques?: ('editorial' | 'comercial')[] } = {}) {
   const log = opts.log ?? (() => {});
   const kit = cargarKit(p.marca);
   const usos: Uso[] = [];
-  const enfoques: ('editorial' | 'comercial')[] = p.propuestas === 2 ? ['editorial', 'comercial'] : [p.tipo_campana === 'informativa' ? 'editorial' : 'comercial'];
-  const propuestas = await Promise.all(enfoques.map((e) => generarPropuesta(kit, p, e, usos, log)));
+  const enfoques: ('editorial' | 'comercial')[] = opts.enfoques?.length ? opts.enfoques : p.propuestas === 2 ? ['editorial', 'comercial'] : [p.tipo_campana === 'informativa' ? 'editorial' : 'comercial'];
+  const propuestas = await Promise.all(enfoques.map((e) => generarPropuesta(kit, p, e, usos, log, opts.anteriores?.[e])));
 
   if (opts.salida) {
     for (const pr of propuestas) {

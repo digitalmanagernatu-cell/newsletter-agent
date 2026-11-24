@@ -1,0 +1,24 @@
+{
+  "name": "@natu/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Módulos comunes: base de datos, historial, coste, autenticación y aprobaciones",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "migrate": "tsx src/migrate.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

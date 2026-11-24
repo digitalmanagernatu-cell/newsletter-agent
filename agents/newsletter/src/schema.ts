@@ -21,6 +21,10 @@ export const PeticionSchema = z.object({
   idioma: z.enum(['es', 'it', 'fr', 'ro', 'en']).default('es'),
   propuestas: z.union([z.literal(1), z.literal(2)]).default(1),
   solicitante_email: z.string().email().optional(),
+  /** Direcciones extra para la prueba (campo libre del formulario). Solo se aceptan dominios de la empresa. */
+  destinatarios_prueba: z.string().optional(),
+  /** Fecha y hora de envío deseada (hora de Madrid, ISO 8601). Se usa al programar (fase 3). */
+  fecha_envio: z.string().optional(),
   feedback: z.string().optional(),
 });
 export type Peticion = z.infer<typeof PeticionSchema>;

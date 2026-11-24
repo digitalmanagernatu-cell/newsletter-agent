@@ -1,0 +1,11 @@
+{
+  "name": "natu-agentes",
+  "private": true,
+  "description": "Sistema multiagente de NATU Laboratories",
+  "workspaces": ["shared", "agents/*"],
+  "scripts": {
+    "migrate": "npm run -w @natu/shared migrate",
+    "test": "npm test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
+}
