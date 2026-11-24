@@ -1,28 +1,129 @@
 {
   "marca": "BetrésON",
   "plataforma": "mailrelay",
-  "idiomas": ["es"],
+  "idiomas": [
+    "es"
+  ],
   "posicionamiento": "Marca propia de NATU para farmacia. Siempre se comunica como venta exclusiva en farmacia.",
-  "universos": ["Perfumería", "Personal Care", "Ambientación", "Pets"],
-  "palabras_prohibidas": { "higiene corporal": "Personal Care" },
+  "universos": [
+    "Perfumería",
+    "Personal Care",
+    "Ambientación",
+    "Pets"
+  ],
+  "palabras_prohibidas": {
+    "higiene corporal": "Personal Care"
+  },
   "logo": {
     "cuadrado": "assets/logo-cuadrado.png",
     "horizontal": "assets/logo-horizontal-negro.png",
     "notas": "Cuadrado: blanco sobre negro. Horizontal: negro sobre transparente.",
-    "ancho_cabecera_px": 180
+    "ancho_cabecera_px": 110,
+    "url_publica_mailrelay": "https://assets.ipzmarketing.com/data/47c03f282c326e732cba24458db095632f9aa559/media_files/88/original/LOGO_Betr%C3%A9s_ON_2.png"
   },
   "colores": {
-    "negro": { "hex": "#000000", "uso": "logo, texto principal, botones" },
-    "blanco": { "hex": "#FFFFFF", "uso": "fondo" },
-    "PENDIENTE": "Colores de acento y de cada universo."
+    "negro": {
+      "hex": "#000000",
+      "uso": "logo, titulares"
+    },
+    "texto": {
+      "hex": "#2E2E2E",
+      "uso": "cuerpo"
+    },
+    "texto_suave": {
+      "hex": "#868686",
+      "uso": "textos secundarios"
+    },
+    "blanco": {
+      "hex": "#FFFFFF",
+      "uso": "fondo del cuerpo"
+    },
+    "fondo_pie": {
+      "hex": "#F5F4EE",
+      "uso": "pie y bloques de cierre"
+    },
+    "separador": {
+      "hex": "#C9CCCF",
+      "uso": "líneas divisorias"
+    },
+    "dorado": {
+      "hex": "#AE8937",
+      "uso": "subrayado de frases clave, acento"
+    },
+    "acento_estacional": {
+      "uso": "Libre según campaña (p. ej. rosa #FBEEF0 en Navidad, rojo #B8202B). Nunca sustituye al negro del logo."
+    }
   },
   "tipografias": {
-    "titulares": { "web": "PENDIENTE (el logo usa una sans geométrica)", "fallback": "Arial, Helvetica, sans-serif" },
-    "cuerpo": { "fallback": "Arial, Helvetica, sans-serif" }
+    "titulares": {
+      "web": "Arial / Helvetica en negrita",
+      "fallback": "Arial, Helvetica, sans-serif"
+    },
+    "cuerpo": {
+      "web": "Arial",
+      "tamano_px": 15,
+      "interlineado": 1.6,
+      "fallback": "Arial, Helvetica, sans-serif"
+    },
+    "editorial_opcional": {
+      "web": "Georgia (cursiva para acentos)",
+      "fallback": "Georgia, 'Times New Roman', serif",
+      "nota": "Usado en la campaña 82 (más editorial)."
+    }
   },
-  "layout": { "ancho_max_px": 600, "margen_lateral_px": 24, "espaciado_bloques_px": 32 },
-  "remitente": { "mailrelay_sender_id": 1, "nombre": "Betrés ON", "email": "info@betreson.com" },
-  "destino": { "mailrelay_group_ids": [6], "nombre": "Farmacias Activas" },
-  "pie_legal": "PENDIENTE: razón social, CIF, dirección, texto RGPD. Enlace de baja de Mailrelay: PENDIENTE de verificar la etiqueta.",
-  "pendiente": ["colores de acento", "tipografía", "tono", "pie legal", "newsletters de ejemplo"]
+  "layout": {
+    "ancho_max_px": 600,
+    "margen_lateral_px": 24,
+    "espaciado_bloques_px": 32
+  },
+  "remitente": {
+    "mailrelay_sender_id": 1,
+    "nombre": "Betrés ON",
+    "email": "info@betreson.com"
+  },
+  "destino": {
+    "mailrelay_group_ids": [
+      6
+    ],
+    "nombre": "Farmacias Activas"
+  },
+  "pendiente": [
+    "destino del CTA 'comercial de zona'"
+  ],
+  "audiencia": "Farmacias (B2B). Se habla al farmacéutico de tú ('tu farmacia', 'tus clientes'). El consumidor final compra en exclusiva en farmacia.",
+  "estructura_habitual": [
+    "Cabecera: logo cuadrado negro centrado sobre blanco",
+    "Imagen principal a todo el ancho",
+    "Titular centrado en negrita + antetítulo/subtítulo en mayúsculas",
+    "Texto centrado, frases clave en negrita y destacado dorado",
+    "Productos en filas alternas imagen/texto",
+    "Bloque de condiciones o escalado de precios",
+    "CTA de texto: 'Haz tu pedido a tu comercial de zona'",
+    "Pie: ¡Síguenos en RRSS! + iconos, datos de contacto, texto legal y baja"
+  ],
+  "cta_habitual": {
+    "texto": "Haz tu pedido a tu comercial de zona",
+    "enlace": "PENDIENTE: hoy no enlaza a nada concreto"
+  },
+  "pie": {
+    "rrss": {
+      "instagram": "https://www.instagram.com/betres_on/",
+      "facebook": "https://www.facebook.com/BetresONfarmacia",
+      "tiktok": "https://www.tiktok.com/@betreson",
+      "web": "https://betreson.com/"
+    },
+    "contacto": {
+      "email": "pedidosbetreson@natuaromatic.com",
+      "telefono": "+34 868 499 989"
+    },
+    "legal": "En cumplimiento de lo dispuesto en la Protección de Datos. Para modificar sus derechos de acceso, rectificación, cancelación y oposición al tratamiento de sus datos personales, contenidos en nuestras condiciones de protección de datos, solamente tiene que responder a este e-mail indicando su email en el asunto, o bien a través del envío de un correo ordinario a la dirección: info@betreson.com.",
+    "baja": "Si desea darse de baja también puede hacer clic <a href=\"[unsubscribe_url_click]\">aquí</a>.",
+    "etiqueta_baja_mailrelay": "[unsubscribe_url_click]"
+  },
+  "tono": "Cercano y profesional, de partner comercial a farmacia. Beneficio para la farmacia (rotación, ticket medio, fidelización, diferenciación). Frases cortas, negritas en lo esencial, emojis solo en el asunto.",
+  "ejemplos": [
+    "ejemplos/mailrelay-64.html (Preventa PETS)",
+    "ejemplos/mailrelay-74.html (Mikado Navidad)",
+    "ejemplos/mailrelay-82.html (Planifica pedidos Navidad, estilo editorial)"
+  ]
 }

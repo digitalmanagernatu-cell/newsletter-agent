@@ -97,9 +97,13 @@ Campos de fusión útiles: `MMERGE5` TIPO CLIENTE, `MMERGE6`/`MMERGE10` grupo cl
 ## 4. Decisiones
 
 - **BetrésON** se envía solo al grupo **Farmacias Activas** (id 6).
-- **NATU**: audiencia NATU (`269aad017f`). Un segmento por idioma: Natu ES, Natu IT, Natu FR, Natu RO y Natu EN (este último lo creará Irene). Si la petición indica "toda la base de datos", se envía a toda la audiencia NATU.
+- **NATU**: audiencia NATU (`269aad017f`). Un segmento por idioma: GRANEL ES, GRANEL IT, GRANEL FR, GRANEL RO y GRANEL EN (este último lo creará Irene). No hay opción de "toda la base de datos".
 - **Destinatarios de prueba**: campo libre en el formulario, en el que quien hace la petición escribe a quién enviarla.
 
 - n8n: el de la nube.
 - Repositorio: `newsletter-agent`, con estructura de monorepo para renombrarlo después a `natu-agentes`.
 - Postgres: proyecto Neon propio para el agente, con suspensión automática para no agotar la cuota.
+
+## 5. Hallazgo en campañas anteriores
+
+- La campaña 82 de Mailrelay ("Planifica tus pedidos…") lleva el enlace de baja como `{{%20unsubscribe_url%20}}` (codificado), que probablemente no se sustituye y deja el enlace roto. La etiqueta que funciona en las campañas 64 y 74 es `[unsubscribe_url_click]`. El agente validará siempre que la etiqueta de baja esté presente y sin codificar.

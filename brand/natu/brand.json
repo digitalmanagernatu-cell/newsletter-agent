@@ -2,10 +2,20 @@
   "marca": "NATU Laboratories",
   "fuente": "brandbook-natu-v1.pdf (versión 1.0, 2024)",
   "plataforma": "mailchimp",
-  "idiomas": ["es", "it", "fr", "ro", "en"],
+  "idiomas": [
+    "es",
+    "it",
+    "fr",
+    "ro",
+    "en"
+  ],
   "nombre_escrito": {
     "correcto": "NATU Laboratories",
-    "incorrecto": ["NATU LABORATORIES", "Natu LABORATORIES", "NatuLaboratories"]
+    "incorrecto": [
+      "NATU LABORATORIES",
+      "Natu LABORATORIES",
+      "NatuLaboratories"
+    ]
   },
   "logo": {
     "principal": "assets/logo-cuadrado.png",
@@ -14,23 +24,94 @@
     "ancho_cabecera_px": 120
   },
   "colores": {
-    "principal_oscuro": { "hex": "#373736", "uso": "texto principal, cabecera/pie, botones" },
-    "principal_claro": { "hex": "#DBD7D2", "uso": "fondos de sección, separadores" },
-    "rosa": { "hex": "#F39C98", "uso": "acento: perfumería, promociones" },
-    "melocoton": { "hex": "#F0BAA4", "uso": "acento: cosmética" },
-    "verde_salvia": { "hex": "#D0D6C3", "uso": "acento: ambientación, fondos" },
-    "arena": { "hex": "#DFD6BE", "uso": "fondos cálidos, bloques editoriales" },
-    "blanco": { "hex": "#FFFFFF", "uso": "fondo del cuerpo" },
+    "principal_oscuro": {
+      "hex": "#373736",
+      "uso": "texto principal, cabecera/pie, botones"
+    },
+    "principal_claro": {
+      "hex": "#DBD7D2",
+      "uso": "fondos de sección, separadores"
+    },
+    "rosa": {
+      "hex": "#F39C98",
+      "uso": "acento: perfumería, promociones"
+    },
+    "melocoton": {
+      "hex": "#F0BAA4",
+      "uso": "acento: cosmética"
+    },
+    "verde_salvia": {
+      "hex": "#D0D6C3",
+      "uso": "acento: ambientación, fondos"
+    },
+    "arena": {
+      "hex": "#DFD6BE",
+      "uso": "fondos cálidos, bloques editoriales"
+    },
+    "blanco": {
+      "hex": "#FFFFFF",
+      "uso": "fondo del cuerpo"
+    },
     "pendiente_confirmar": "El brandbook da hex distintos de su propio RGB (p. ej. #e2a29a frente a R243 G156 B152). Se usan los valores RGB; confirmar con diseño."
   },
   "tipografias": {
-    "titulares": { "web": "Montserrat", "pesos": [300, 400, 600, 900], "google_fonts": true, "fallback": "Arial, Helvetica, sans-serif" },
-    "cuerpo": { "web": "Montserrat", "pesos": [300, 400], "fallback": "Arial, Helvetica, sans-serif" },
-    "complementaria": { "web": "Athelas", "uso": "citas y acentos editoriales en cursiva", "fallback": "Georgia, 'Times New Roman', serif", "nota": "Athelas no es fuente web libre: en email se usa siempre Georgia." }
+    "titulares": {
+      "web": "Montserrat",
+      "pesos": [
+        300,
+        400,
+        600,
+        900
+      ],
+      "google_fonts": true,
+      "fallback": "Arial, Helvetica, sans-serif"
+    },
+    "cuerpo": {
+      "web": "Montserrat",
+      "pesos": [
+        300,
+        400
+      ],
+      "fallback": "Arial, Helvetica, sans-serif"
+    },
+    "complementaria": {
+      "web": "Athelas",
+      "uso": "citas y acentos editoriales en cursiva",
+      "fallback": "Georgia, 'Times New Roman', serif",
+      "nota": "Athelas no es fuente web libre: en email se usa siempre Georgia."
+    }
   },
-  "layout": { "ancho_max_px": 600, "margen_lateral_px": 24, "espaciado_bloques_px": 32 },
-  "boton": { "fondo": "#373736", "texto": "#FFFFFF", "radio_px": 0, "padding": "14px 28px", "mayusculas": true, "espaciado_letras": "2px", "fuente": "Montserrat 600" },
+  "layout": {
+    "ancho_max_px": 600,
+    "margen_lateral_px": 24,
+    "espaciado_bloques_px": 32
+  },
+  "boton": {
+    "fondo": "#373736",
+    "texto": "#FFFFFF",
+    "radio_px": 0,
+    "padding": "14px 28px",
+    "mayusculas": true,
+    "espaciado_letras": "2px",
+    "fuente": "Montserrat 600"
+  },
   "tono": "Profesional, cercano y experto. Destacar I+D+i, calidad, capacidad industrial, tendencias de mercado y servicio 360°. Sin superlativos vacíos.",
   "pie_legal": "PENDIENTE: razón social, CIF, dirección, texto RGPD, redes sociales. Enlace de baja: *|UNSUB|*",
-  "pendiente": ["pie legal", "redes sociales", "confirmar hex", "newsletters de ejemplo"]
+  "pendiente": [
+    "pie legal",
+    "redes sociales",
+    "confirmar hex",
+    "newsletters de ejemplo"
+  ],
+  "mailchimp": {
+    "list_id": "269aad017f",
+    "segmentos_por_idioma": {
+      "es": 7222685,
+      "it": 7222686,
+      "fr": 7222687,
+      "ro": 7222688,
+      "en": "PENDIENTE (GRANEL EN, lo crea Irene)"
+    },
+    "etiqueta_baja": "*|UNSUB|*"
+  }
 }
