@@ -40,6 +40,18 @@ async function alojarImagenes(p: Peticion, carpetaId: number): Promise<Peticion>
   };
 }
 
+/** Separa las direcciones a las que Mailrelay no entregará (bajas, rebotes, bloqueos). */
+async function comprobarEntregables(emails: string[]) {
+  const entregables: string[] = [];
+  const no_entregables: { email: string; motivo: string }[] = [];
+  for (const e of emails) {
+    const motivo = await mailrelay().motivoNoEntregable(e);
+    if (motivo) no_entregables.push({ email: e, motivo });
+    else entregables.push(e);
+  }
+  return { entregables, no_entregables };
+}
+
 async function guardarVersion(peticionId: string, numero: number, pr: Propuesta, feedback?: string, capturaUrl?: string) {
   const [v] = await q<{ id: string }>(
     `INSERT INTO newsletter.versiones (peticion_id, numero, enfoque, composicion, mjml, html, avisos, revisiones, captura_url, feedback)
@@ -66,7 +78,10 @@ async function procesar(tareaId: string, peticionId: string, p: Peticion, numero
     const bloqueantes = propuestas.flatMap((pr) => pr.avisos.filter((a) => a.nivel === 'error').map((a) => `${pr.enfoque}: ${a.detalle}`));
     if (bloqueantes.length) throw new Error(`La newsletter tiene errores que impiden crear el borrador: ${bloqueantes.join(' | ')}`);
 
-    const destinatarios = filtrarPruebas([p.solicitante_email, p.destinatarios_prueba]);
+    const filtrados = filtrarPruebas([p.solicitante_email, p.destinatarios_prueba]);
+    const { entregables, no_entregables } = await comprobarEntregables(filtrados.validos);
+    const destinatarios = { validos: entregables, rechazados: filtrados.rechazados, no_entregables };
+    if (no_entregables.length) l(`no llegará a: ${no_entregables.map((n) => `${n.email} (${n.motivo})`).join(', ')}`);
     const resultado = [];
     for (const pr of propuestas) {
       const captura = await mailrelay().subirImagen(`captura-${peticionId.slice(0, 8)}-v${numero}-${pr.enfoque}.png`, pr.capturas.escritorio, carpetaMedios);
@@ -154,8 +169,11 @@ export async function regenerar(peticionId: string, feedback: string, actor?: st
 }
 
 export async function enviarPrueba(peticionId: string, emails: string, actor?: string) {
-  const dest = filtrarPruebas([emails]);
-  if (!dest.validos.length) throw new Error(`Ninguna dirección válida. Solo se admiten los dominios de la empresa. Rechazadas: ${dest.rechazados.join(', ')}`);
+  const filtrados = filtrarPruebas([emails]);
+  if (!filtrados.validos.length) throw new Error(`Ninguna dirección válida. Solo se admiten los dominios de la empresa. Rechazadas: ${filtrados.rechazados.join(', ')}`);
+  const { entregables, no_entregables } = await comprobarEntregables(filtrados.validos);
+  if (!entregables.length) throw new Error(`Mailrelay no entregará a ninguna dirección: ${no_entregables.map((n) => `${n.email} (${n.motivo})`).join(', ')}`);
+  const dest = { validos: entregables, rechazados: filtrados.rechazados, no_entregables };
   const camps = await q<{ id_externo: string; numero: number }>(
     `SELECT c.id_externo, v.numero FROM newsletter.campanas c JOIN newsletter.versiones v ON v.id = c.version_id
      WHERE v.peticion_id = $1 AND c.plataforma = 'mailrelay' AND c.estado = 'borrador'`, [peticionId],
@@ -169,7 +187,7 @@ export async function enviarPrueba(peticionId: string, emails: string, actor?: s
   }
   await q("UPDATE newsletter.peticiones SET estado = 'prueba_enviada', actualizado = now() WHERE id = $1 AND estado IN ('borrador','prueba_enviada')", [peticionId]);
   await registrarEvento({ agente: AGENTE, recurso: recurso(peticionId), tipo: 'prueba_enviada', actor, datos: dest });
-  return { enviada_a: dest.validos, rechazadas: dest.rechazados, campanas: camps.map((c) => Number(c.id_externo)) };
+  return { enviada_a: dest.validos, rechazadas: dest.rechazados, no_entregables: dest.no_entregables, campanas: camps.map((c) => Number(c.id_externo)) };
 }
 
 export async function estado(opts: { peticion_id?: string; tarea_id?: string }) {

@@ -103,5 +103,23 @@ export class Mailrelay {
     await this.pedir('POST', `/campaigns/${id}/send_test`, { test_emails: emails.join(',') });
   }
 
+  /**
+   * Mailrelay descarta en silencio los envíos (también las pruebas) a direcciones
+   * dadas de baja, rebotadas o bloqueadas. Devuelve el motivo si no llegará.
+   */
+  async motivoNoEntregable(email: string): Promise<string | null> {
+    const r = await this.pedir<{ status: string; unsubscribed: boolean; unsubscribed_at: string | null; bounced: boolean; reported_spam: boolean; local_ban: boolean; global_ban: boolean }[]>(
+      'GET', `/subscribers?q%5Bemail_eq%5D=${encodeURIComponent(email)}`,
+    );
+    const s = r[0];
+    if (!s) return null;
+    if (s.unsubscribed) return `dada de baja en Mailrelay${s.unsubscribed_at ? ` el ${s.unsubscribed_at.slice(0, 10)}` : ''}`;
+    if (s.bounced) return 'rebotada en Mailrelay';
+    if (s.reported_spam) return 'marcó un envío como spam';
+    if (s.local_ban || s.global_ban) return 'bloqueada en Mailrelay';
+    if (s.status && s.status !== 'active') return `estado "${s.status}" en Mailrelay`;
+    return null;
+  }
+
   urlPanel = (id: number) => `https://${this.cuenta}/admin/campaigns/${id}/edit`;
 }
