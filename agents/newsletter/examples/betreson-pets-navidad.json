@@ -1,0 +1,16 @@
+{
+  "marca": "betreson",
+  "tipo_campana": "promo",
+  "objetivo": "EJEMPLO DE PRUEBA (datos ficticios). Que las farmacias amplíen su pedido de la gama Pets antes de Navidad y la coloquen como regalo para mascotas.",
+  "asunto_sugerido": "Regalos de Navidad para las mascotas de tus clientes",
+  "mensaje": "En Navidad muchas familias también buscan un detalle para su mascota. La gama Betrés ON Pets (bruma perfumada para perros, ambientador textil y mikado con tecnología neutralizadora de olores) es un regalo perfecto y de alta rotación. Durante diciembre, 10% de descuento en todos los pedidos de la gama Pets a partir de 24 unidades.",
+  "textos_clave": ["10% de descuento en la gama Pets", "Pedido mínimo 24 unidades", "Válido del 1 al 31 de diciembre", "Venta exclusiva en farmacia"],
+  "productos": [
+    { "nombre": "Ambientador textil Fabric spray", "descripcion": "Actúa sobre los textiles donde convive la mascota (camas, mantas, sofás) y elimina los malos olores sin enmascararlos.", "imagen": "https://assets.ipzmarketing.com/data/47c03f282c326e732cba24458db095632f9aa559/media_files/158/original/fabric-spray.png" },
+    { "nombre": "Mikado Pets 100 ml", "descripcion": "Perfuma de forma continua y neutraliza los olores asociados a las mascotas.", "imagen": "https://assets.ipzmarketing.com/data/47c03f282c326e732cba24458db095632f9aa559/media_files/159/original/mikado-pets.png" },
+    { "nombre": "Bruma perfumada para perros", "descripcion": "El producto con el que nació la gama, con gran acogida en farmacia." }
+  ],
+  "imagenes": [{ "url": "https://assets.ipzmarketing.com/data/47c03f282c326e732cba24458db095632f9aa559/media_files/156/original/PETS.png", "descripcion": "Bodegón de la gama Betrés ON Pets con un perro caniche en un salón" }],
+  "idioma": "es",
+  "propuestas": 2
+}

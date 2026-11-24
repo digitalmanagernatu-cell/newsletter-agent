@@ -1,0 +1,82 @@
+{
+  "enfoque": "comercial",
+  "asunto": "Navidad Pets: 10% dto. desde 24 uds.",
+  "preheader": "Impulsa el regalo para mascotas en tu farmacia del 1 al 31 de diciembre.",
+  "acento": "#B8202B",
+  "bloques": [
+    {
+      "block": "hero",
+      "src": "https://assets.ipzmarketing.com/data/47c03f282c326e732cba24458db095632f9aa559/media_files/156/original/PETS.png",
+      "alt": "Bodegón de la gama Betrés ON Pets con un perro caniche en un salón"
+    },
+    {
+      "block": "banner",
+      "text": "CAMPAÑA DE NAVIDAD",
+      "background": "#B8202B",
+      "color": "#FFFFFF"
+    },
+    {
+      "block": "title",
+      "eyebrow": "PROMOCIÓN PETS",
+      "title_html": "Un regalo de Navidad que <em>rota</em> en tu farmacia",
+      "subtitle": "VENTA EXCLUSIVA EN FARMACIA",
+      "style": "sans",
+      "align": "center"
+    },
+    {
+      "block": "price_table",
+      "title": "Condiciones de la promoción",
+      "rows": [
+        {
+          "label": "Descuento",
+          "value": "10% en la gama Pets"
+        },
+        {
+          "label": "Pedido mínimo",
+          "value": "24 unidades"
+        },
+        {
+          "label": "Validez",
+          "value": "Del 1 al 31 de diciembre"
+        }
+      ],
+      "note_html": "<strong>Venta exclusiva en farmacia.</strong>"
+    },
+    {
+      "block": "text",
+      "html": "<p>En Navidad, muchas familias también buscan un detalle para su mascota. <strong>Betrés ON Pets</strong> es una propuesta perfecta para colocación de temporada y regalo.</p><p>Una gama pensada para ayudarte a <strong>generar rotación</strong>, elevar el <strong>ticket medio</strong> y diferenciar tu surtido con una venta exclusiva en farmacia.</p>",
+      "align": "center"
+    },
+    {
+      "block": "product_rows",
+      "items": [
+        {
+          "image": "https://assets.ipzmarketing.com/data/47c03f282c326e732cba24458db095632f9aa559/media_files/158/original/fabric-spray.png",
+          "alt": "Ambientador textil Fabric spray de Betrés ON Pets",
+          "name": "Ambientador textil Fabric spray",
+          "description_html": "Actúa sobre los textiles donde convive la mascota <strong>(camas, mantas, sofás)</strong> y elimina los malos olores <strong>sin enmascararlos</strong>."
+        },
+        {
+          "image": "https://assets.ipzmarketing.com/data/47c03f282c326e732cba24458db095632f9aa559/media_files/159/original/mikado-pets.png",
+          "alt": "Mikado Pets 100 ml de Betrés ON Pets",
+          "name": "Mikado Pets 100 ml",
+          "description_html": "Perfuma de forma continua y <strong>neutraliza los olores</strong> asociados a las mascotas."
+        }
+      ],
+      "image_side": "alternate"
+    },
+    {
+      "block": "divider"
+    },
+    {
+      "block": "highlight_box",
+      "html": "<strong>Bruma perfumada para perros</strong><br>El producto con el que nació la gama, con gran acogida en farmacia."
+    },
+    {
+      "block": "cta",
+      "text_html": "Haz tu pedido a tu <strong><u>comercial de zona</u></strong><br><span style=\"color:#B8202B;\"><strong>10% de descuento en la gama Pets · pedido mínimo 24 unidades · del 1 al 31 de diciembre</strong></span>",
+      "style": "text"
+    }
+  ],
+  "razonamiento": "La estructura pone primero la promoción y sus condiciones para facilitar una lectura comercial rápida. Después presenta los productos con imagen y deja la bruma, sin foto, en un bloque independiente para mantener claridad y buen ritmo visual."
+}
