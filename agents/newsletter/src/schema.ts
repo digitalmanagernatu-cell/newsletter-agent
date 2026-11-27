@@ -19,7 +19,7 @@ export const PeticionSchema = z.object({
   productos: z.array(ProductoSchema).default([]),
   imagenes: z.array(z.object({ url: z.string().url(), descripcion: z.string().optional() })).default([]),
   /** Imágenes subidas en el formulario de n8n (base64). Se suben a la plataforma y pasan a `imagenes`. */
-  adjuntos: z.array(z.object({ nombre: z.string(), contenido_base64: z.string().max(14_000_000), descripcion: z.string().optional() })).default([]),
+  adjuntos: z.array(z.object({ nombre: z.string(), contenido_base64: z.string().max(14_000_000), descripcion: z.string().optional() })).max(10).default([]),
   idioma: z.enum(['es', 'it', 'fr', 'ro', 'en']).default('es'),
   /** NATU: idiomas en los que sale (una campaña por idioma, cada una a su segmento). BetrésON: siempre español. */
   idiomas: z.array(z.enum(['es', 'it', 'fr', 'ro', 'en'])).min(1).optional(),

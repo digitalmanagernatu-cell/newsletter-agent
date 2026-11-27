@@ -81,7 +81,8 @@ function crearServidorMcp() {
 
 export function crearApp() {
   const app = express();
-  app.use(express.json({ limit: '2mb' }));
+  // Las imágenes subidas en el formulario viajan en base64 dentro de la petición (hasta 10 MB cada una).
+  app.use(express.json({ limit: '80mb' }));
 
   app.get('/health', (_req, res) => { res.json({ ok: true, agente: 'newsletter' }); });
 
@@ -151,6 +152,13 @@ export function crearApp() {
   app.get('/v1/newsletters/:id', ruta((r) => svc.estado({ peticion_id: String(r.params.id) })));
   app.get('/v1/tareas/:id', ruta((r) => svc.estado({ tarea_id: String(r.params.id) })));
   app.post('/v1/newsletters/:id/cancelar', ruta((r) => apr.cancelarProgramacion(String(r.params.id), String(r.body?.actor ?? ''), r.body?.motivo)));
+
+  // Errores del propio Express (cuerpo demasiado grande, JSON mal formado): respuesta clara en JSON.
+  app.use((err: { type?: string; status?: number }, _req: Request, res: Response, next: NextFunction) => {
+    if (err?.type === 'entity.too.large') { res.status(413).json({ error: 'La petición es demasiado grande: reduce el tamaño o el número de imágenes (máximo 10 MB por imagen).' }); return; }
+    if (err?.type === 'entity.parse.failed') { res.status(400).json({ error: 'El cuerpo de la petición no es JSON válido.' }); return; }
+    next(err);
+  });
   return app;
 }
 
